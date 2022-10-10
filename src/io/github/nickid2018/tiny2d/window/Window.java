@@ -5,8 +5,8 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.util.function.BiConsumer;
 
-import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public class Window {
 
