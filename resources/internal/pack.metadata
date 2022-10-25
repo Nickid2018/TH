@@ -1,0 +1,7 @@
+{
+    "pack_format" : 1,
+    "name" : "Internal Data Pack",
+    "description" : "A pack for testing the new resource pack format",
+    "authors" : ["Nickid2018"],
+    "version" : "1.0"
+}

@@ -20,7 +20,7 @@ public class Playground {
     }
 
     public void update() {
-        bullets.forEach(Bullet::update);
+        bullets.forEach(Bullet::tick);
         bullets.removeAll(toDelete);
         toDelete.clear();
     }

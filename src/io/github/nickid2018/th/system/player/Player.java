@@ -25,17 +25,6 @@ public abstract class Player implements HittableItem {
         return sphere;
     }
 
-    @Override
-    public void updatePosition(float x, float y) {
-        sphere.x = x;
-        sphere.y = y;
-    }
-
-    @Override
-    public void updateRadius(float r) {
-        sphere.r = r;
-    }
-
     public Sphere sphere() {
         return sphere;
     }

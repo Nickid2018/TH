@@ -8,6 +8,9 @@ project.ext.lwjglVersion = '3.3.1'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://libraries.minecraft.net"
+    }
 }
 
 sourceSets {
@@ -42,10 +45,15 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
     implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.19.0'
 
-    implementation 'org.openjdk.nashorn:nashorn-core:15.3'
+    implementation 'org.openjdk.nashorn:nashorn-core:15.4'
+    implementation 'com.github.oshi:oshi-core:6.3.0'
+    implementation 'com.mojang:datafixerupper:5.0.28'
 
-    implementation 'com.github.oshi:oshi-core:5.8.0'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 }
