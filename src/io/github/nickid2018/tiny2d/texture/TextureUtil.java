@@ -1,5 +1,6 @@
 package io.github.nickid2018.tiny2d.texture;
 
+import io.github.nickid2018.tiny2d.RenderThreadOnly;
 import org.lwjgl.system.MemoryUtil;
 
 import java.io.FileInputStream;
@@ -11,45 +12,54 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
-import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public class TextureUtil {
 
+    @RenderThreadOnly
     public static int generateTextureId() {
         return glGenTextures();
     }
 
+    @RenderThreadOnly
     public static void releaseTextureId(int id) {
         glDeleteTextures(id);
     }
 
+    @RenderThreadOnly
     public static void bind(int id) {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
+    @RenderThreadOnly
     public static void prepareImage(int id, int width, int height) {
-        prepareImage(InternalGlFormat.RGBA, id, 0, width, height);
+        prepareImage(InternalGLFormat.RGBA, id, 0, width, height);
     }
 
-    public static void prepareImage(InternalGlFormat format, int id, int width, int height) {
+    @RenderThreadOnly
+    public static void prepareImage(InternalGLFormat format, int id, int width, int height) {
         prepareImage(format, id, 0, width, height);
     }
 
+    @RenderThreadOnly
     public static void prepareImage(int id, int mipmap, int width, int height) {
-        prepareImage(InternalGlFormat.RGBA, id, mipmap, width, height);
+        prepareImage(InternalGLFormat.RGBA, id, mipmap, width, height);
     }
 
-    public static void prepareImage(InternalGlFormat format, int id, int mipmap, int width, int height) {
+    @RenderThreadOnly
+    public static void prepareImage(InternalGLFormat format, int id, int mipmap, int width, int height) {
         bind(id);
         if (mipmap >= 0) {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipmap);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, 0);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, mipmap);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0F);
-        }
-        for (int level = 0; level <= mipmap; level++)
-            glTexImage2D(GL_TEXTURE_2D, level, format.glFormat(), width >> level, height >> level, 0, GL_RGBA,
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipmap - 1);
+            glTexImage2D(GL_TEXTURE_2D, 0, format.glFormat(), width, height, 0, GL_RGBA,
                     GL_UNSIGNED_BYTE, 0);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
     }
 
     public static ByteBuffer readResource(InputStream inputStream) throws IOException {
@@ -69,6 +79,7 @@ public class TextureUtil {
         return buffer;
     }
 
+    @RenderThreadOnly
     public static void writeAsPNG(String path, int id, int levels, int width, int height) {
         bind(id);
         for (int level = 0; level <= levels; level++) {
@@ -83,6 +94,7 @@ public class TextureUtil {
         }
     }
 
+    @RenderThreadOnly
     public static void initTexture(IntBuffer pixels, int width, int height) {
         glPixelStorei(GL_UNPACK_SWAP_BYTES, 0);
         glPixelStorei(GL_UNPACK_LSB_FIRST, 0);

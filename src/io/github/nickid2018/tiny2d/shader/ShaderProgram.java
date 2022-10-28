@@ -55,8 +55,8 @@ public class ShaderProgram {
         return DEFAULT_SHADERS.computeIfAbsent(name, s -> {
             ShaderProgram program = new ShaderProgram();
             try {
-                program.attachShader(ShaderSource.createShader(ShaderType.VERTEX, "/assets/shader/" + name + ".vsh"));
-                program.attachShader(ShaderSource.createShader(ShaderType.FRAGMENT, "/assets/shader/" + name + ".fsh"));
+                program.attachShader(ShaderSource.createShader(ShaderType.VERTEX, "/assets/shader/default/" + name + ".vsh"));
+                program.attachShader(ShaderSource.createShader(ShaderType.FRAGMENT, "/assets/shader/default/" + name + ".fsh"));
                 program.link();
                 return program;
             } catch (IOException e) {

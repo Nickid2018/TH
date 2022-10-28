@@ -1,4 +1,4 @@
-package io.github.nickid2018.th.system.pack;
+package io.github.nickid2018.th.pack;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

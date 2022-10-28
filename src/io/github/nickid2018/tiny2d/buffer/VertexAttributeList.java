@@ -6,7 +6,6 @@ import java.util.Set;
 
 public class VertexAttributeList {
 
-
     public static final VertexAttributeList TEXTURE_2D =
             new VertexAttributeList(VertexAttribute.POSITION_2D, VertexAttribute.UV);
     public static final VertexAttributeList COLOR_TEXTURE_2D =

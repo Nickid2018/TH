@@ -64,9 +64,13 @@ public class VectorFont {
     }
 
     public float getSpaceLength(int size) {
+        return getCharLength(size, ' ');
+    }
+
+    public float getCharLength(int size, int codepoint) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer advance = stack.mallocInt(1);
-            STBTruetype.stbtt_GetCodepointHMetrics(font, ' ', advance, null);
+            STBTruetype.stbtt_GetCodepointHMetrics(font, codepoint, advance, null);
             return advance.get(0) * STBTruetype.stbtt_ScaleForPixelHeight(font, size);
         }
     }

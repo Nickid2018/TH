@@ -1,14 +1,15 @@
 package io.github.nickid2018.th.gui;
 
-import io.github.nickid2018.th.system.Playground;
+import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.tiny2d.buffer.FrameBuffer;
 import io.github.nickid2018.tiny2d.gui.GuiRenderContext;
 import io.github.nickid2018.tiny2d.gui.RenderComponent;
-import io.github.nickid2018.tiny2d.math.Matrix4f;
 import io.github.nickid2018.tiny2d.shader.ShaderProgram;
 import io.github.nickid2018.tiny2d.shader.ShaderSource;
 import io.github.nickid2018.tiny2d.shader.ShaderType;
+import io.github.nickid2018.tiny2d.shader.Uniform;
 import io.github.nickid2018.tiny2d.util.LazyLoadValue;
+import io.github.nickid2018.tiny2d.window.Window;
 
 import java.io.IOException;
 
@@ -32,8 +33,8 @@ public class PlayGroundGui extends RenderComponent {
     private FrameBuffer buffer;
     private Playground playground;
 
-    public PlayGroundGui(int x, int y, int width, int height, Playground playground) {
-        super(x, y, width, height);
+    public PlayGroundGui(Window window, int x, int y, int width, int height, Playground playground) {
+        super(window, x, y, width, height);
         this.playground = playground;
         buffer = new FrameBuffer(Playground.PLAYGROUND_WIDTH, Playground.PLAYGROUND_HEIGHT);
     }
@@ -61,18 +62,20 @@ public class PlayGroundGui extends RenderComponent {
         if (playground.getPlayer().getMissedPosition() != null) {
             ShaderProgram program = MISSED.get();
             program.use();
-            program.getUniform("transform").setMatrix4f(false, Matrix4f.identity());
+            program.getUniform("transform").setMatrix4f(false, Uniform.IDENTITY_MATRIX);
             program.getUniform("missedPosition").set2fv(playground.getPlayer().getMissedPosition());
             program.getUniform("missedTimeCount").setFloat(playground.getPlayer().getMissedTimeCount());
         } else {
             ShaderProgram program = Shaders.TEX_COLOR.get();
             program.use();
-            program.getUniform("transform").setMatrix4f(false, Matrix4f.identity());
+            program.getUniform("transform").setMatrix4f(false, Uniform.IDENTITY_MATRIX);
         }
     }
 
     @Override
     public void render(GuiRenderContext context) {
+        playground.update();
+
         buffer.bind();
         renderBackground(context);
         renderPlayerAndEnemy(context);

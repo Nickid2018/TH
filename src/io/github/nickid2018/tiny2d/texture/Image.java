@@ -72,7 +72,7 @@ public class Image implements AutoCloseable {
         } else {
             pixels = MemoryUtil.nmemAlloc(size);
         }
-        MemoryUtil.memSet(pixels, (byte) 0, size);
+        MemoryUtil.memSet(pixels, 0, size);
     }
 
     public Image(ImageFormat format, int width, int height, boolean useStbFree, long addr) {

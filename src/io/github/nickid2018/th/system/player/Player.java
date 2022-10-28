@@ -1,21 +1,25 @@
 package io.github.nickid2018.th.system.player;
 
 import io.github.nickid2018.th.phys.Sphere;
-import io.github.nickid2018.tiny2d.math.Vec2f;
-import io.github.nickid2018.th.system.HittableItem;
+import io.github.nickid2018.th.system.compute.HittableItem;
+import io.github.nickid2018.th.system.compute.Playground;
+import org.joml.Vector2f;
 
 public abstract class Player implements HittableItem {
 
-    private final Sphere sphere;
-    private final String name;
+    protected final Playground playground;
 
-    private Vec2f missedPosition;
-    private int missedTimeCount = 0;
+    protected final Sphere sphere;
+    protected final String name;
 
-    private int bombCount = 3;
-    private int players = 3;
+    protected Vector2f missedPosition;
+    protected int missedTimeCount = 0;
 
-    public Player(Sphere sphere, String name) {
+    protected int bombCount = 3;
+    protected int players = 3;
+
+    public Player(Playground playground, Sphere sphere, String name) {
+        this.playground = playground;
         this.sphere = sphere;
         this.name = name;
     }
@@ -49,7 +53,7 @@ public abstract class Player implements HittableItem {
         this.players = players;
     }
 
-    public void setMissed(Vec2f missedPosition) {
+    public void setMissed(Vector2f missedPosition) {
         this.missedPosition = missedPosition;
     }
 
@@ -57,7 +61,7 @@ public abstract class Player implements HittableItem {
         return missedTimeCount;
     }
 
-    public Vec2f getMissedPosition() {
+    public Vector2f getMissedPosition() {
         return missedPosition;
     }
 

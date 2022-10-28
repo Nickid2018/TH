@@ -1,22 +1,46 @@
-var ScriptRunner = Java.type('io.github.nickid2018.th.system.script.ScriptRunner');
-var JS_LOGGER = ScriptRunner.JS_LOGGER;
+var bridge = {
 
-function checkPackage(name) {
-    if (!ScriptRunner.instance.packageLoaded(name)) {
-        try {
-            ScriptRunner.instance.loadPackage(name);
-        } catch (e) {
-            error('Failed to load package ' + name, e);
-        }
-        return false;
+    getClass: function (name) {
+        return Java.type(name);
+    },
+
+    getStaticElement: function (clazz, name) {
+        return Java.type(clazz)[name];
     }
-    return true;
-}
+};
+
+var engine = {
+
+    ScriptRunner: bridge.getClass('io.github.nickid2018.th.system.script.ScriptRunner'),
+    JS_LOGGER: bridge.getStaticElement('io.github.nickid2018.th.system.script.ScriptRunner', 'JS_LOGGER'),
+    packageLoaded: bridge.getStaticElement('io.github.nickid2018.th.system.script.ScriptRunner', 'packageLoaded'),
+    loadPackage: bridge.getStaticElement('io.github.nickid2018.th.system.script.ScriptRunner', 'loadPackage'),
+
+    checkPackage: function (name) {
+        if (!engine.packageLoaded(name)) {
+            try {
+                engine.loadPackage(name);
+            } catch (e) {
+                error('Failed to load package ' + name, e);
+            }
+            return false;
+        }
+        return true;
+    },
+
+    print: function (msg) {
+        engine.JS_LOGGER.info(msg);
+    },
+
+    error: function (msg, e) {
+        engine.JS_LOGGER.error(msg, e);
+    }
+};
 
 function print(msg) {
-    JS_LOGGER.info(msg);
+    engine.print(msg);
 }
 
 function error(msg, e) {
-    JS_LOGGER.error(msg, e);
+    engine.error(msg, e);
 }

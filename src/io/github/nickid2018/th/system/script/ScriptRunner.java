@@ -64,7 +64,9 @@ public class ScriptRunner {
     public static void main(String[] args) {
         ScriptRunner.init();
         try {
-            ScriptRunner.getJSObject("ScriptRunner").call(null, "Hello World!", new Exception());
+            ScriptRunner.evalString("""
+                    print(engine.packageLoaded);
+                    """);
         } catch (Exception e) {
             e.printStackTrace();
         }

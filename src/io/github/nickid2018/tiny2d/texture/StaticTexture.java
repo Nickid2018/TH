@@ -1,6 +1,6 @@
 package io.github.nickid2018.tiny2d.texture;
 
-import org.lwjgl.stb.STBImage;
+import io.github.nickid2018.tiny2d.RenderThreadOnly;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -19,12 +19,9 @@ public class StaticTexture implements Texture {
         TextureUtil.prepareImage(id, image.getWidth(), image.getHeight());
     }
 
-    public void bind() {
+    @RenderThreadOnly
+    public void bindInternal() {
         glBindTexture(GL_TEXTURE_2D, id);
-    }
-
-    public void unbind() {
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     public int getLevel() {
@@ -35,6 +32,7 @@ public class StaticTexture implements Texture {
         return linear;
     }
 
+    @RenderThreadOnly
     public StaticTexture setLinear(boolean linear) {
         this.linear = linear;
         return this;
@@ -44,6 +42,7 @@ public class StaticTexture implements Texture {
         return clamp;
     }
 
+    @RenderThreadOnly
     public StaticTexture setClamp(boolean clamp) {
         this.clamp = clamp;
         return this;
@@ -57,15 +56,30 @@ public class StaticTexture implements Texture {
         return image;
     }
 
+    @RenderThreadOnly
     public StaticTexture update() {
         return update(0, 0, image.getWidth(), image.getHeight());
     }
 
+    @RenderThreadOnly
     public StaticTexture update(int x, int y, int sizeX, int sizeY) {
-        bind();
+        bindInternal();
         image.upload(0, x, y, x, y, sizeX, sizeY, linear, clamp, level > 0);
         if (level > 0)
             glGenerateMipmap(level);
         return this;
+    }
+
+    @RenderThreadOnly
+    @Override
+    public void delete() {
+        glDeleteTextures(id);
+    }
+
+    @RenderThreadOnly
+    @Override
+    public void deleteTextureAndImage() {
+        glDeleteTextures(id);
+        image.close();
     }
 }
