@@ -16,6 +16,7 @@ public class Shaders {
             program.attachShader(ShaderSource.createShader(ShaderType.FRAGMENT, "/shaders/tex_color.fsh"));
             program.link();
             program.addUniform("transform");
+            program.addUniform("color");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

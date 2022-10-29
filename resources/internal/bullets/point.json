@@ -1,0 +1,6 @@
+{
+  "radius": 1.0,
+  "texture": {
+    "location": "textures/bullet/point.png"
+  }
+}

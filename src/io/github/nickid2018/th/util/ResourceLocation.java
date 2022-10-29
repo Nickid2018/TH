@@ -9,7 +9,7 @@ public record ResourceLocation(String namespace, String path) {
     public static ResourceLocation fromString(String path) {
         int index = path.indexOf(':');
         if (index == -1)
-            return new ResourceLocation("internal", path);
+            return new ResourceLocation(null, path);
         return new ResourceLocation(path.substring(0, index), path.substring(index + 1));
     }
 

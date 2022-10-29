@@ -11,9 +11,7 @@ public class InternalDataPack extends DataPack {
         loadDataList();
     }
 
-    public byte[] getEntry(String name) throws IOException {
-        try (InputStream inputStream = InternalDataPack.class.getResourceAsStream("/internal/" + name)) {
-            return inputStream == null ? null : inputStream.readAllBytes();
-        }
+    public InputStream getEntryInStream(String name) {
+        return InternalDataPack.class.getResourceAsStream("/internal/" + name);
     }
 }

@@ -36,6 +36,7 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-openal:${lwjglVersion}:natives-windows"
     runtimeOnly "org.lwjgl:lwjgl-stb:${lwjglVersion}:natives-windows"
     implementation 'org.joml:joml:1.10.4'
+    implementation 'com.madgag:animated-gif-lib:1.4'
 
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'com.google.guava:guava:31.1-jre'

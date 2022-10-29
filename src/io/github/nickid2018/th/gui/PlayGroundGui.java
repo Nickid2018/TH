@@ -1,7 +1,8 @@
 package io.github.nickid2018.th.gui;
 
+import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.compute.Playground;
-import io.github.nickid2018.tiny2d.buffer.FrameBuffer;
+import io.github.nickid2018.tiny2d.buffer.*;
 import io.github.nickid2018.tiny2d.gui.GuiRenderContext;
 import io.github.nickid2018.tiny2d.gui.RenderComponent;
 import io.github.nickid2018.tiny2d.shader.ShaderProgram;
@@ -10,6 +11,8 @@ import io.github.nickid2018.tiny2d.shader.ShaderType;
 import io.github.nickid2018.tiny2d.shader.Uniform;
 import io.github.nickid2018.tiny2d.util.LazyLoadValue;
 import io.github.nickid2018.tiny2d.window.Window;
+import lombok.Getter;
+import org.joml.Matrix4f;
 
 import java.io.IOException;
 
@@ -30,13 +33,17 @@ public class PlayGroundGui extends RenderComponent {
         return program;
     });
 
-    private FrameBuffer buffer;
-    private Playground playground;
+    private final FrameBuffer buffer;
+    private final Playground playground;
 
-    public PlayGroundGui(Window window, int x, int y, int width, int height, Playground playground) {
+    @Getter
+    private final int guiScale;
+
+    public PlayGroundGui(Window window, int x, int y, int width, int height, Playground playground, int guiScale) {
         super(window, x, y, width, height);
         this.playground = playground;
-        buffer = new FrameBuffer(Playground.PLAYGROUND_WIDTH, Playground.PLAYGROUND_HEIGHT);
+        this.guiScale = guiScale;
+        buffer = new FrameBuffer(Playground.PLAYGROUND_WIDTH * guiScale, Playground.PLAYGROUND_HEIGHT * guiScale);
     }
 
     private void renderBackground(GuiRenderContext context) {
@@ -48,7 +55,27 @@ public class PlayGroundGui extends RenderComponent {
     }
 
     private void renderBullets(GuiRenderContext context) {
+        for (Bullet bullet : playground.getBullets()) {
+            Matrix4f matrix = new Matrix4f();
+            float x = bullet.getHitSphere().x / Playground.PLAYGROUND_WIDTH * 2 - 1;
+            float y = bullet.getHitSphere().y / Playground.PLAYGROUND_HEIGHT * 2 - 1;
 
+            VertexArray array = bullet.getBulletBasicData().getVertexArray();
+            float halfHorizontal = bullet.getBulletBasicData().getHalfHorizontal();
+            float halfVertical = bullet.getBulletBasicData().getHalfVertical();
+
+            if (bullet.getBulletBasicData().isHasRenderAngle())
+                matrix.rotate(bullet.getRenderAngle(), 0, 0, 1);
+            matrix.translate(x - halfHorizontal, y - halfVertical, 0);
+            matrix.scale(guiScale, guiScale, 1);
+
+            ShaderProgram program = Shaders.TEX_COLOR.get();
+            program.use();
+            program.getUniform("transform").setMatrix4f(false, matrix);
+            if (bullet.getBulletBasicData().isHasTint())
+                program.getUniform("color").set3fv(bullet.getColor());
+            array.draw();
+        }
     }
 
     private void renderForeground(GuiRenderContext context) {

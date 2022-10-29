@@ -3,25 +3,37 @@ package io.github.nickid2018.th.system.bullet;
 import io.github.nickid2018.th.phys.Sphere;
 import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.compute.Playground;
+import lombok.Getter;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 public abstract class Bullet implements HittableItem {
 
     protected final Playground playground;
+
     protected final Sphere sphere;
+
+    @Getter
+    protected final BulletBasicData bulletBasicData;
+
+    @Getter
     protected long lifeTime;
 
-    public Bullet(Playground playground, Sphere sphere) {
+    @Getter
+    protected float renderAngle;
+
+    @Getter
+    protected Vector3f color;
+
+    public Bullet(Playground playground, BulletBasicData bulletBasicData, Vector2f position) {
         this.playground = playground;
-        this.sphere = sphere;
-        lifeTime = 0;
+        this.bulletBasicData = bulletBasicData;
+        this.sphere = new Sphere(position, bulletBasicData.getRadius());
+        lifeTime = -15;
     }
 
     @Override
     public Sphere getHitSphere() {
         return sphere;
-    }
-
-    public long getLifeTime() {
-        return lifeTime;
     }
 }

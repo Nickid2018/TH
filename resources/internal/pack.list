@@ -1,5 +1,5 @@
 {
     "bullet_data" : {
-        "point" : "internal:bullets/point.json"
+        "point" : "bullets/point.json"
     }
 }

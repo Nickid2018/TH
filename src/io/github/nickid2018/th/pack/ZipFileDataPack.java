@@ -21,13 +21,11 @@ public class ZipFileDataPack extends DataPack {
         loadDataList();
     }
 
-    public byte[] getEntry(String name) throws IOException {
+    public InputStream getEntryInStream(String name) throws IOException {
         ZipEntry entry = zipFile.getEntry(name);
         if (entry == null)
             return null;
-        try (InputStream inputStream = zipFile.getInputStream(entry)) {
-            return inputStream.readAllBytes();
-        }
+        return zipFile.getInputStream(entry);
     }
 
     @Override

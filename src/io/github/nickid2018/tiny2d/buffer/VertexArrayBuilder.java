@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.floats.FloatList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.joml.Vector3f;
 
 public class VertexArrayBuilder {
 
@@ -40,6 +41,10 @@ public class VertexArrayBuilder {
         buffer.add(x);
         buffer.add(y);
         return this;
+    }
+
+    public VertexArrayBuilder color(Vector3f color) {
+        return color(color.x, color.y, color.z);
     }
 
     public VertexArrayBuilder color(float r, float g, float b) {

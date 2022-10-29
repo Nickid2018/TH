@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public abstract class DataPack implements Closeable {
@@ -25,7 +26,15 @@ public abstract class DataPack implements Closeable {
         this.namespace = namespace;
     }
 
-    public abstract byte[] getEntry(String name) throws IOException;
+    public byte[] getEntry(String name) throws IOException {
+        try (InputStream stream = getEntryInStream(name)) {
+            if (stream == null)
+                return null;
+            return stream.readAllBytes();
+        }
+    }
+
+    public abstract InputStream getEntryInStream(String name) throws IOException;
 
     public JsonElement getJsonEntry(String name) throws IOException {
         return JsonParser.parseString(new String(getEntry(name), StandardCharsets.UTF_8));

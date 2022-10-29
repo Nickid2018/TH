@@ -7,16 +7,16 @@ import javax.annotation.Nonnull;
 public class AABB {
 
     public static final AABB AABB_NULL = newAABB(0, 0, 0, 0);
-    public double minX;
-    public double minY;
-    public double maxX;
-    public double maxY;
+    public float minX;
+    public float minY;
+    public float maxX;
+    public float maxY;
 
-    public static AABB newAABB(double minX, double minY, double maxX, double maxY) {
+    public static AABB newAABB(float minX, float minY, float maxX, float maxY) {
         return newAABB(minX, minY, maxX, maxY, false);
     }
 
-    public static AABB newAABB(double minX, double minY, double maxX, double maxY, boolean checkValid) {
+    public static AABB newAABB(float minX, float minY, float maxX, float maxY, boolean checkValid) {
         AABB aabb = new AABB();
         aabb.minX = minX;
         aabb.minY = minY;
@@ -33,12 +33,12 @@ public class AABB {
 
     public AABB validate() {
         if (minX > maxX) {
-            double tmp = minX;
+            float tmp = minX;
             minX = maxX;
             maxX = tmp;
         }
         if (minY > maxY) {
-            double tmp = minY;
+            float tmp = minY;
             minY = maxY;
             maxY = tmp;
         }
