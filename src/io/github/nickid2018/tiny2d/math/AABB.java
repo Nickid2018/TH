@@ -1,19 +1,44 @@
 package io.github.nickid2018.tiny2d.math;
 
-import com.google.common.base.Preconditions;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.Getter;
 
 import javax.annotation.Nonnull;
 
 public class AABB {
 
+    public static final Codec<AABB> MIN_MAX_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.FLOAT.fieldOf("minX").forGetter(AABB::getMinX),
+            Codec.FLOAT.fieldOf("minY").forGetter(AABB::getMinY),
+            Codec.FLOAT.fieldOf("maxX").forGetter(AABB::getMaxX),
+            Codec.FLOAT.fieldOf("maxY").forGetter(AABB::getMaxY)
+    ).apply(instance, AABB::newAABB));
+
+    public static final Codec<AABB> WIDTH_HEIGHT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.FLOAT.fieldOf("minX").forGetter(AABB::getMinX),
+            Codec.FLOAT.fieldOf("minY").forGetter(AABB::getMinY),
+            Codec.FLOAT.fieldOf("width").forGetter(AABB::getWidth),
+            Codec.FLOAT.fieldOf("height").forGetter(AABB::getHeight)
+    ).apply(instance, AABB::newAABBSize));
+
     public static final AABB AABB_NULL = newAABB(0, 0, 0, 0);
+
+    @Getter
     public float minX;
+    @Getter
     public float minY;
+    @Getter
     public float maxX;
+    @Getter
     public float maxY;
 
     public static AABB newAABB(float minX, float minY, float maxX, float maxY) {
         return newAABB(minX, minY, maxX, maxY, false);
+    }
+
+    public static AABB newAABBSize(float minX, float minY, float width, float height) {
+        return newAABB(minX, minY, minX + width, minY + height, false);
     }
 
     public static AABB newAABB(float minX, float minY, float maxX, float maxY, boolean checkValid) {
@@ -22,9 +47,7 @@ public class AABB {
         aabb.minY = minY;
         aabb.maxX = maxX;
         aabb.maxY = maxY;
-        if (checkValid)
-            Preconditions.checkArgument(!aabb.isValid(), "Invalid AABB");
-        return aabb.validate();
+        return checkValid ? aabb.validate() : aabb;
     }
 
     public boolean isValid() {
@@ -102,18 +125,15 @@ public class AABB {
         return minX <= x && x <= maxX && minY <= y && y <= maxY;
     }
 
-    public double getWidth() {
-        validate();
+    public float getWidth() {
         return maxX - minX;
     }
 
-    public double getHeight() {
-        validate();
+    public float getHeight() {
         return maxY - minY;
     }
 
     public AABB newCopy() {
-        validate();
         AABB aabb = new AABB();
         aabb.minX = minX;
         aabb.minY = minY;

@@ -29,8 +29,9 @@ public class Playground {
     private final Set<Bullet> bullets = new HashSet<>();
     private final Set<Tickable> toDelete = new HashSet<>();
 
+    @Setter
     @Getter
-    private final Player player;
+    private Player player;
 
     @Getter
     private long tickTime = 0;
@@ -43,8 +44,7 @@ public class Playground {
     @Getter
     protected Random random = new Random();
 
-    public Playground(Player selected) {
-        player = selected;
+    public Playground() {
         playgroundAABB = AABB.newAABB(0, 0, PLAYGROUND_WIDTH, PLAYGROUND_HEIGHT);
     }
 

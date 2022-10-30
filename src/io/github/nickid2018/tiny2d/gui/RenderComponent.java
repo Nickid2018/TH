@@ -40,10 +40,10 @@ public abstract class RenderComponent {
 
     private void computeRenderSize() {
         AABB aabb = resizePolicy.getAABB(x, y, width, height, window);
-        renderX = (float) aabb.minX;
-        renderY = (float) aabb.minY;
-        renderWidth = (float) (aabb.maxX - aabb.minX);
-        renderHeight = (float) (aabb.maxY - aabb.minY);
+        renderX = aabb.minX;
+        renderY = aabb.minY;
+        renderWidth = aabb.maxX - aabb.minX;
+        renderHeight = aabb.maxY - aabb.minY;
     }
 
     public void render(GuiRenderContext context) {
@@ -108,6 +108,21 @@ public abstract class RenderComponent {
         builder.pos(ndcXE, ndcY).color(1, 1, 1).uv(1, 0).end();
         builder.pos(ndcX, ndcYE).color(1, 1, 1).uv(0, 1).end();
         builder.pos(ndcXE, ndcYE).color(1, 1, 1).uv(1, 1).end();
+        return builder.build();
+    }
+
+    @RenderThreadOnly
+    protected VertexArray createWindow2DTexture(Window window) {
+        VertexArrayBuilder builder = new VertexArrayBuilder(
+                VertexAttributeList.TEXTURE_2D, IndexBufferProvider.DEFAULT);
+        float ndcX = window.toNDCX(x);
+        float ndcY = window.toNDCY(y);
+        float ndcXE = window.toNDCX(x + width);
+        float ndcYE = window.toNDCY(y + height);
+        builder.pos(ndcX, ndcY).uv(0, 0).end();
+        builder.pos(ndcXE, ndcY).uv(1, 0).end();
+        builder.pos(ndcX, ndcYE).uv(0, 1).end();
+        builder.pos(ndcXE, ndcYE).uv(1, 1).end();
         return builder.build();
     }
 }

@@ -15,10 +15,26 @@
  */
 package io.github.nickid2018.th;
 
+import io.github.nickid2018.th.gui.GameScreen;
+import io.github.nickid2018.th.pack.FileDataPack;
+import io.github.nickid2018.th.pack.InternalDataPack;
+import io.github.nickid2018.th.pack.PackManager;
+import io.github.nickid2018.tiny2d.font.VectorFont;
+import io.github.nickid2018.tiny2d.window.Window;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class TH {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        PackManager.setPackList(List.of(new InternalDataPack(), new FileDataPack(new File("test"))));
+        VectorFont font = new VectorFont(new FileInputStream("C:\\Windows\\Fonts\\Arial.ttf"));
+        Window window = new Window("TH - Temp Runner", 1200, 916, font);
+        window.setMaxFPS(60);
+        window.switchScreen(new GameScreen(window));
+        window.run(null);
     }
 }

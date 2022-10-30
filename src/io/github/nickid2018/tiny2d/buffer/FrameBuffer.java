@@ -3,10 +3,16 @@ package io.github.nickid2018.tiny2d.buffer;
 import io.github.nickid2018.tiny2d.RenderThreadOnly;
 import io.github.nickid2018.tiny2d.shader.ShaderProgram;
 import io.github.nickid2018.tiny2d.util.LazyLoadValue;
+import lombok.Getter;
 
 import static org.lwjgl.opengl.GL30.*;
 
 public class FrameBuffer {
+
+    @Getter
+    private final int width;
+    @Getter
+    private final int height;
 
     private final int framebufferID;
     private final int textureID;
@@ -23,6 +29,9 @@ public class FrameBuffer {
 
     @RenderThreadOnly
     public FrameBuffer(int width, int height) {
+        this.width = width;
+        this.height = height;
+
         framebufferID = glGenFramebuffers();
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
 
@@ -47,6 +56,7 @@ public class FrameBuffer {
     @RenderThreadOnly
     public void bind() {
         glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+        glViewport(0, 0, width, height);
     }
 
     @RenderThreadOnly
@@ -78,6 +88,12 @@ public class FrameBuffer {
         shader.use();
         bindTexture();
         defaultVAO.get().draw();
+    }
+
+    @RenderThreadOnly
+    public void clear() {
+        glClearColor(0, 1, 1, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     public int getTexture() {

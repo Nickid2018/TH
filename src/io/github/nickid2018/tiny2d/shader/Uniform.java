@@ -23,6 +23,10 @@ public class Uniform {
         return name;
     }
 
+    public void setMatrix4f(Matrix4f matrix) {
+        glUniformMatrix4fv(location, false, matrix.get(new float[16]));
+    }
+
     public void setMatrix4f(boolean transpose, Matrix4f matrix) {
         glUniformMatrix4fv(location, transpose, matrix.get(new float[16]));
     }

@@ -56,12 +56,13 @@ public class Window {
         while (!glfwWindowShouldClose(windowID)) {
             double startTime = glfwGetTime();
 
+            defaultFrameBuffer.unbind();
             glClearColor(1, 1, 1, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
             defaultFrameBuffer.bind();
             glClearColor(1, 1, 1, 1);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             if (currentScreen != null)
                 currentScreen.render(new GuiRenderContext(this, fontRenderer, defaultFrameBuffer));
             defaultFrameBuffer.unbind();

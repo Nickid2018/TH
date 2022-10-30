@@ -33,6 +33,11 @@ public class ShaderSource {
                 Objects.requireNonNull(ShaderSource.class.getResourceAsStream(location)), StandardCharsets.UTF_8));
     }
 
+    @RenderThreadOnly
+    public static ShaderSource createShader(ShaderType type, byte[] source) {
+        return new ShaderSource(type, new String(source, StandardCharsets.UTF_8));
+    }
+
     public ShaderType getType() {
         return type;
     }
