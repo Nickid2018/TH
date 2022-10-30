@@ -1,10 +1,14 @@
 package io.github.nickid2018.th.pack;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonParser;
 import io.github.nickid2018.th.util.ResourceLocation;
 import it.unimi.dsi.fastutil.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +24,8 @@ public class PackManager {
 
     public static InputStream createInputStream(ResourceLocation location) {
         for (Pair<String, DataPack> pair : PACK_LIST) {
-            if (location.namespace() == null || pair.left().equals(location.namespace())) {
+            if (pair.right().hasEntry(location.path()) &&
+                    (location.namespace() == null || pair.left().equals(location.namespace()))) {
                 try {
                     InputStream stream = pair.right().getEntryInStream(location.path());
                     if (stream != null)
@@ -30,5 +35,23 @@ public class PackManager {
             }
         }
         return null;
+    }
+
+    public static String getNamespaceDefaultSelect(String path) {
+        for (Pair<String, DataPack> pair : PACK_LIST) {
+            if (pair.right().hasEntry(path))
+                return pair.left();
+        }
+        return null;
+    }
+
+    public static JsonElement createJSON(ResourceLocation location) {
+        try (InputStream stream = createInputStream(location)) {
+            if (stream == null)
+                return JsonNull.INSTANCE;
+            return JsonParser.parseString(new String(stream.readAllBytes(), StandardCharsets.UTF_8));
+        } catch (IOException ignored) {
+            return JsonNull.INSTANCE;
+        }
     }
 }

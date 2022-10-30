@@ -15,6 +15,11 @@ public class FileDataPack extends DataPack {
     }
 
     @Override
+    public boolean hasEntry(String name) {
+        return new File(root.getAbsolutePath() + "/" + name).exists();
+    }
+
+    @Override
     public InputStream getEntryInStream(String name) throws IOException {
         File file = new File(root.getAbsolutePath() + "/" + name);
         return new FileInputStream(file);

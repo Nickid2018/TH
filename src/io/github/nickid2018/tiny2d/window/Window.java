@@ -31,8 +31,9 @@ public class Window {
     private Consumer<FrameBuffer> postRenderer;
     private Screen currentScreen;
 
-    public Window(String title, int width, int height, VectorFont font) {
+    public Window(String title, int width, int height, VectorFont font, boolean resizeable) {
         glfwInit();
+        glfwWindowHint(GLFW_RESIZABLE, resizeable ? GLFW_TRUE : GLFW_FALSE);
         windowID = glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         glfwMakeContextCurrent(windowID);
         GL.createCapabilities();

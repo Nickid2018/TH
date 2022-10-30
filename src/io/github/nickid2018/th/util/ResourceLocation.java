@@ -1,6 +1,9 @@
 package io.github.nickid2018.th.util;
 
 import com.mojang.serialization.Codec;
+import io.github.nickid2018.th.pack.PackManager;
+
+import java.util.Objects;
 
 public record ResourceLocation(String namespace, String path) {
 
@@ -14,7 +17,24 @@ public record ResourceLocation(String namespace, String path) {
     }
 
     public String toString() {
-        return namespace + ":" + path;
+        return namespace == null ? path : namespace + ":" + path;
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj instanceof ResourceLocation other) {
+            return path.equals(other.path) &&
+                    (Objects.equals(namespace, other.namespace) ||
+                            (namespace == null && Objects.equals(PackManager.getNamespaceDefaultSelect(path), other.namespace)));
+        }
+        return false;
     }
 
     public static ResourceLocation internal(String path) {

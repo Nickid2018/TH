@@ -1,5 +1,7 @@
 package io.github.nickid2018.th.gui;
 
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.texture.*;
@@ -13,19 +15,30 @@ public class ImageRepository {
 
     public static int mipmapLevel = 4;
     private static final Map<ResourceLocation, Texture> TEXTURE_MAP = new HashMap<>();
+    private static final Map<ResourceLocation, TextureDefinition> TEXTURE_DEFINITION_MAP = new HashMap<>();
 
     public static Texture MISSING_TEXTURE;
+
+    public static TextureDefinition createDefinition(ResourceLocation location) {
+        return TEXTURE_DEFINITION_MAP.computeIfAbsent(location, l -> TextureDefinition.CODEC.parse(
+                new Dynamic<>(JsonOps.INSTANCE, PackManager.createJSON(l))).getOrThrow(false, str -> {})
+        );
+    }
+
+    public static Texture createTexture(ResourceLocation definition) {
+        return createTexture(createDefinition(definition));
+    }
 
     public static Texture createTexture(TextureDefinition definition) {
         return createTexture(definition.location(), definition.isGIF(), definition.clamp(), definition.linearFilter());
     }
 
-    public static Texture createTexture(ResourceLocation location, boolean isGIF, boolean clamp, boolean linear) {
-        if (TEXTURE_MAP.containsKey(location))
-            return TEXTURE_MAP.get(location);
+    public static Texture createTexture(ResourceLocation imageLocation, boolean isGIF, boolean clamp, boolean linear) {
+        if (TEXTURE_MAP.containsKey(imageLocation))
+            return TEXTURE_MAP.get(imageLocation);
 
         Texture texture;
-        try (InputStream stream = PackManager.createInputStream(location)){
+        try (InputStream stream = PackManager.createInputStream(imageLocation)){
             if (stream == null)
                 texture = getMissingTexture();
             else if (isGIF) {
@@ -41,7 +54,7 @@ public class ImageRepository {
         texture.setClamp(clamp);
         texture.setLinear(linear);
         texture.update();
-        TEXTURE_MAP.put(location, texture);
+        TEXTURE_MAP.put(imageLocation, texture);
         return texture;
     }
 

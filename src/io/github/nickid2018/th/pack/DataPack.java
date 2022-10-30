@@ -34,6 +34,7 @@ public abstract class DataPack implements Closeable {
         }
     }
 
+    public abstract boolean hasEntry(String name);
     public abstract InputStream getEntryInStream(String name) throws IOException;
 
     public JsonElement getJsonEntry(String name) throws IOException {

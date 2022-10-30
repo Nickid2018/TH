@@ -21,6 +21,11 @@ public class ZipFileDataPack extends DataPack {
         loadDataList();
     }
 
+    @Override
+    public boolean hasEntry(String name) {
+        return zipFile.getEntry(name) != null;
+    }
+
     public InputStream getEntryInStream(String name) throws IOException {
         ZipEntry entry = zipFile.getEntry(name);
         if (entry == null)

@@ -14,6 +14,7 @@ import io.github.nickid2018.tiny2d.gui.GuiRenderContext;
 import io.github.nickid2018.tiny2d.gui.Screen;
 import io.github.nickid2018.tiny2d.window.Window;
 import org.apache.commons.io.IOUtils;
+import org.joml.Random;
 import org.joml.Vector2f;
 
 import java.io.IOException;
@@ -40,7 +41,11 @@ public class GameScreen extends Screen {
                         PackManager.createInputStream(ResourceLocation.fromString("bullets/white_point.json")), StandardCharsets.UTF_8))))
                 .getOrThrow(false, error -> {});
 
-        playground.addBullet(new SimpleBullet(playground, bulletBasicData, new Vector2f(100, 100)));
+        Random random = new Random();
+        for (int i = 0; i < 100; i++) {
+            playground.addBullet(new SimpleBullet(playground, bulletBasicData,
+                    new Vector2f(random.nextInt(Playground.PLAYGROUND_WIDTH), random.nextInt(Playground.PLAYGROUND_HEIGHT))));
+        }
     }
 
     private static class SimpleBullet extends Bullet {

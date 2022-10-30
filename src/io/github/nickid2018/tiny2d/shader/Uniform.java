@@ -14,6 +14,10 @@ public class Uniform {
     private final String name;
     private final int location;
 
+    private final float[] floatBuffer2 = new float[2];
+    private final float[] floatBuffer3 = new float[3];
+    private final float[] floatBuffer16 = new float[16];
+
     public Uniform(String name, int location) {
         this.name = name;
         this.location = location;
@@ -24,11 +28,11 @@ public class Uniform {
     }
 
     public void setMatrix4f(Matrix4f matrix) {
-        glUniformMatrix4fv(location, false, matrix.get(new float[16]));
+        glUniformMatrix4fv(location, false, matrix.get(floatBuffer16));
     }
 
     public void setMatrix4f(boolean transpose, Matrix4f matrix) {
-        glUniformMatrix4fv(location, transpose, matrix.get(new float[16]));
+        glUniformMatrix4fv(location, transpose, matrix.get(floatBuffer16));
     }
 
     public void setFloat(float value) {
@@ -36,18 +40,28 @@ public class Uniform {
     }
 
     public void set2fv(Vector2f vector) {
-        glUniform2fv(location, new float[]{vector.x, vector.y});
+        floatBuffer2[0] = vector.x;
+        floatBuffer2[1] = vector.y;
+        glUniform2fv(location, floatBuffer2);
     }
 
     public void set2fv(float x, float y) {
-        glUniform2fv(location, new float[]{x, y});
+        floatBuffer2[0] = x;
+        floatBuffer2[1] = y;
+        glUniform2fv(location, floatBuffer2);
     }
 
     public void set3fv(Vector3f vector) {
-        glUniform3fv(location, new float[]{vector.x, vector.y, vector.z});
+        floatBuffer3[0] = vector.x;
+        floatBuffer3[1] = vector.y;
+        floatBuffer3[2] = vector.z;
+        glUniform3fv(location, floatBuffer3);
     }
 
     public void set3fv(float r, float g, float b) {
-        glUniform3fv(location, new float[]{r, g, b});
+        floatBuffer3[0] = r;
+        floatBuffer3[1] = g;
+        floatBuffer3[2] = b;
+        glUniform3fv(location, floatBuffer3);
     }
 }

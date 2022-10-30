@@ -32,7 +32,7 @@ public class TH {
     public static void main(String[] args) throws IOException {
         PackManager.setPackList(List.of(new InternalDataPack(), new FileDataPack(new File("test"))));
         VectorFont font = new VectorFont(new FileInputStream("C:\\Windows\\Fonts\\Arial.ttf"));
-        Window window = new Window("TH - Temp Runner", 1200, 916, font);
+        Window window = new Window("TH - Temp Runner", 1200, 916, font, false);
         window.setMaxFPS(60);
         window.switchScreen(new GameScreen(window));
         window.run(null);

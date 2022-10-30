@@ -39,8 +39,8 @@ public class BulletBasicData {
     public static final Codec<BulletBasicData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.floatRange(0, 50).fieldOf("radius").forGetter(BulletBasicData::getRadius),
             AABB.MIN_MAX_CODEC.fieldOf("render_size").forGetter(BulletBasicData::getRenderAABB),
-            Codec.BOOL.orElse(true).fieldOf("has_render_angle").forGetter(BulletBasicData::isHasRenderAngle),
-            Codec.BOOL.orElse(true).fieldOf("has_tint").forGetter(BulletBasicData::isHasTint),
+            Codec.BOOL.fieldOf("has_render_angle").orElse(true).forGetter(BulletBasicData::isHasRenderAngle),
+            Codec.BOOL.fieldOf("has_tint").orElse(true).forGetter(BulletBasicData::isHasTint),
             SpriteDefinition.CODEC.fieldOf("sprite").forGetter(BulletBasicData::getSprite)
     ).apply(instance, BulletBasicData::new));
 
@@ -51,7 +51,7 @@ public class BulletBasicData {
         this.hasRenderAngle = hasRenderAngle;
         this.hasTint = hasTint;
         this.sprite = sprite;
-        this.texture = sprite.texture();
+        this.texture = sprite.getTextureDefinition();
         textureInstance = ImageRepository.createTexture(texture);
 
         if (textureInstance instanceof DynamicTexture)
