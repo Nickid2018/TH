@@ -57,6 +57,10 @@ public class Window {
         while (!glfwWindowShouldClose(windowID)) {
             double startTime = glfwGetTime();
 
+            glfwPollEvents();
+            if (programExtraLogic != null)
+                programExtraLogic.run();
+
             defaultFrameBuffer.unbind();
             glClearColor(1, 1, 1, 1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -74,10 +78,6 @@ public class Window {
                 defaultFrameBuffer.renderToScreen();
 
             glfwSwapBuffers(windowID);
-            glfwPollEvents();
-
-            if (programExtraLogic != null)
-                programExtraLogic.run();
 
             fpsCount++;
             if (glfwGetTime() - lastRecordTime >= 1) {

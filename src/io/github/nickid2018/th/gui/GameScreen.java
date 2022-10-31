@@ -38,20 +38,20 @@ public class GameScreen extends Screen {
         });
         BulletBasicData bulletBasicData = BulletBasicData.CODEC
                 .parse(new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(IOUtils.toString(
-                        PackManager.createInputStream(ResourceLocation.fromString("bullets/white_point.json")), StandardCharsets.UTF_8))))
+                        PackManager.createInputStream(ResourceLocation.fromString("bullets/point.json")), StandardCharsets.UTF_8))))
                 .getOrThrow(false, error -> {});
 
         Random random = new Random();
         for (int i = 0; i < 100; i++) {
-            playground.addBullet(new SimpleBullet(playground, bulletBasicData,
+            playground.addBullet(new SimpleBullet(playground, bulletBasicData, "orange",
                     new Vector2f(random.nextInt(Playground.PLAYGROUND_WIDTH), random.nextInt(Playground.PLAYGROUND_HEIGHT))));
         }
     }
 
     private static class SimpleBullet extends Bullet {
 
-        public SimpleBullet(Playground playground, BulletBasicData bulletBasicData, Vector2f position) {
-            super(playground, bulletBasicData, position);
+        public SimpleBullet(Playground playground, BulletBasicData bulletBasicData, String variant, Vector2f position) {
+            super(playground, bulletBasicData, variant, position);
         }
 
         @Override

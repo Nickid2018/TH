@@ -68,8 +68,6 @@ public class PlayGroundGui extends RenderComponent {
             float x = bullet.getHitSphere().x / Playground.PLAYGROUND_WIDTH * 2 - 1;
             float y = bullet.getHitSphere().y / Playground.PLAYGROUND_HEIGHT * 2 - 1;
 
-            VertexArray array = bullet.getBulletBasicData().getVertexArray();
-
             if (bullet.getBulletBasicData().isHasRenderAngle())
                 matrix.rotate(bullet.getRenderAngle(), 0, 0, 1);
             matrix.translate(x, y, 0);
@@ -83,8 +81,8 @@ public class PlayGroundGui extends RenderComponent {
             else
                 program.getUniform("color").set3fv(1, 1, 1);
 
-            bullet.getBulletBasicData().getTextureInstance().bind();
-            array.draw();
+            bullet.getBulletBasicData().getTexture(bullet.getVariant()).bind();
+            bullet.getBulletBasicData().getVertexArray(bullet.getVariant()).draw();
         }
         GL11.glDisable(GL11.GL_BLEND);
     }

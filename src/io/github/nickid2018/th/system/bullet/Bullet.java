@@ -15,6 +15,8 @@ public abstract class Bullet implements HittableItem {
 
     @Getter
     protected final BulletBasicData bulletBasicData;
+    @Getter
+    protected final String variant;
 
     @Getter
     protected long lifeTime;
@@ -25,9 +27,10 @@ public abstract class Bullet implements HittableItem {
     @Getter
     protected Vector3f color;
 
-    public Bullet(Playground playground, BulletBasicData bulletBasicData, Vector2f position) {
+    public Bullet(Playground playground, BulletBasicData bulletBasicData, String variant, Vector2f position) {
         this.playground = playground;
         this.bulletBasicData = bulletBasicData;
+        this.variant = variant;
         this.sphere = new Sphere(position, bulletBasicData.getRadius());
         lifeTime = -15;
     }
