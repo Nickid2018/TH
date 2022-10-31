@@ -19,7 +19,7 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BulletBasicData {
+public class BulletBasicData implements Comparable<BulletBasicData> {
 
     @Getter
     private final float radius;
@@ -29,6 +29,8 @@ public class BulletBasicData {
     private final boolean hasRenderAngle;
     @Getter
     private final boolean hasTint;
+    @Getter
+    private final int priority;
     @Getter
     private final Map<String, Texture> texture = new HashMap<>();
     @Getter
@@ -41,6 +43,7 @@ public class BulletBasicData {
             AABB.MIN_MAX_CODEC.fieldOf("render_size").forGetter(BulletBasicData::getRenderAABB),
             Codec.BOOL.fieldOf("has_render_angle").orElse(true).forGetter(BulletBasicData::isHasRenderAngle),
             Codec.BOOL.fieldOf("has_tint").orElse(true).forGetter(BulletBasicData::isHasTint),
+            Codec.INT.fieldOf("priority").orElse(Integer.MIN_VALUE).forGetter(BulletBasicData::getPriority),
             Codec.either(
                     SpriteDefinition.CODEC,
                     Codec.unboundedMap(Codec.STRING, SpriteDefinition.CODEC)
@@ -48,16 +51,17 @@ public class BulletBasicData {
     ).apply(instance, BulletBasicData::new));
 
     public BulletBasicData(float radius, AABB renderAABB,
-                           boolean hasRenderAngle, boolean hasTint,
+                           boolean hasRenderAngle, boolean hasTint, int priority,
                            Either<SpriteDefinition, Map<String, SpriteDefinition>> spriteData) {
         this.radius = radius;
         this.renderAABB = renderAABB;
         this.hasRenderAngle = hasRenderAngle;
         this.hasTint = hasTint;
+        this.priority = priority;
 
         spriteData.ifLeft(sprite -> sprites.put("default", sprite)).ifRight(sprites::putAll);
 
-        for (Map.Entry<String, SpriteDefinition> entry : this.sprites.entrySet()) {
+        for (Map.Entry<String, SpriteDefinition> entry : sprites.entrySet()) {
             Texture textureData = ImageRepository.createTexture(entry.getValue().getTextureDefinition());
 
             if (textureData instanceof DynamicTexture)
@@ -94,5 +98,10 @@ public class BulletBasicData {
 
     public VertexArray getVertexArray(String variant) {
         return variant == null || !vertexArray.containsKey(variant) ? vertexArray.get("default") : vertexArray.get(variant);
+    }
+
+    @Override
+    public int compareTo(BulletBasicData o) {
+        return Integer.compare(priority, o.priority);
     }
 }

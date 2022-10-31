@@ -43,6 +43,15 @@ public class Window {
         this.height = height;
         defaultFrameBuffer = new FrameBuffer(width, height);
         fontRenderer = new FontRenderer(this, font);
+
+        glfwSetKeyCallback(windowID, (window, key, scancode, action, mods) -> {
+            if (currentScreen != null) {
+                if (action == GLFW_PRESS)
+                    currentScreen.onKeyPressed(key);
+                else if (action == GLFW_RELEASE)
+                    currentScreen.onKeyReleased(key);
+            }
+        });
     }
 
     public void setMaxFPS(int maxFPS) {

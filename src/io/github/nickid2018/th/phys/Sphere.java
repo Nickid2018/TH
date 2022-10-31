@@ -24,4 +24,9 @@ public class Sphere {
     public AABB getOuterAABB() {
         return AABB.newAABB(x - r, y - r, x + r, y + r);
     }
+
+    public void move(float hori, float vert) {
+        x += hori;
+        y += vert;
+    }
 }

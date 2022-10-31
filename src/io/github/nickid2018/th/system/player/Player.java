@@ -3,25 +3,53 @@ package io.github.nickid2018.th.system.player;
 import io.github.nickid2018.th.phys.Sphere;
 import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.compute.Playground;
+import lombok.Getter;
+import lombok.Setter;
+import org.joml.Math;
 import org.joml.Vector2f;
 
 public abstract class Player implements HittableItem {
 
+    public static final float SQRT_2 = (float) Math.sqrt(2);
+
     protected final Playground playground;
 
+    @Getter
+    private final PlayerBasicData basicData;
+    @Getter
     protected final Sphere sphere;
-    protected final String name;
 
+    // ---- Miss ----
+    @Getter
+    @Setter
     protected Vector2f missedPosition;
+    @Getter
+    @Setter
     protected int missedTimeCount = 0;
-
+    // ---- Resource ----
+    @Getter
+    @Setter
     protected int bombCount = 3;
+    @Getter
+    @Setter
     protected int players = 3;
+    // ---- Render And Control ----
+    @Getter
+    @Setter
+    protected int renderTurnTick = 0;
+    @Getter
+    @Setter
+    protected boolean slowMode = false;
 
-    public Player(Playground playground, Sphere sphere, String name) {
+    @Getter
+    @Setter
+    // 0: static, 1: left, 2: right, 4: up, 8: down
+    protected int moveFlag = 0;
+
+    public Player(Playground playground, PlayerBasicData playerBasicData) {
         this.playground = playground;
-        this.sphere = sphere;
-        this.name = name;
+        this.basicData = playerBasicData;
+        this.sphere = new Sphere(Playground.PLAYGROUND_WIDTH / 2f, 400, playerBasicData.hitRadius());
     }
 
     @Override
@@ -29,47 +57,31 @@ public abstract class Player implements HittableItem {
         return sphere;
     }
 
-    public Sphere sphere() {
-        return sphere;
-    }
-
-    public String name() {
-        return name;
-    }
-
-    public int getBombCount() {
-        return bombCount;
-    }
-
-    public int getPlayers() {
-        return players;
-    }
-
-    public void setBombCount(int bombCount) {
-        this.bombCount = bombCount;
-    }
-
-    public void setPlayers(int players) {
-        this.players = players;
-    }
-
-    public void setMissed(Vector2f missedPosition) {
-        this.missedPosition = missedPosition;
-    }
-
-    public int getMissedTimeCount() {
-        return missedTimeCount;
-    }
-
-    public Vector2f getMissedPosition() {
-        return missedPosition;
-    }
-
     @Override
-    public String toString() {
-        return "Player[" +
-                "sphere=" + sphere + ", " +
-                "name=" + name + ']';
-    }
+    public void tick(long tickTime) {
+        switch (moveFlag & 3) {
+            case 0, 3 -> {
+                if (renderTurnTick != 0)
+                    renderTurnTick += renderTurnTick > 0 ? -1 : 1;
+            }
+            case 1 -> renderTurnTick = Math.min(renderTurnTick - 1, -1);
+            case 2 -> renderTurnTick = Math.max(renderTurnTick + 1, 1);
+        }
 
+        boolean validHorizontal = (((moveFlag & 2) >> 1) ^ (moveFlag & 1)) != 0;
+        boolean validVertical = (((moveFlag & 8) >> 1) ^ (moveFlag & 4)) != 0;
+
+        float speed = slowMode ? basicData.slowSpeed() : basicData.normalSpeed();
+        if (validHorizontal && validVertical) {
+            float hori = ((moveFlag & 1) == 0 ? 1 : -1) * speed / SQRT_2;
+            float vert = ((moveFlag & 4) == 0 ? 1 : -1) * speed / SQRT_2;
+            sphere.move(hori, vert);
+        } else if (validHorizontal)
+            sphere.move(((moveFlag & 1) == 0 ? 1 : -1) * speed, 0);
+        else if (validVertical)
+            sphere.move(0, ((moveFlag & 4) == 0 ? 1 : -1) * speed);
+
+        sphere.x = Math.clamp(8, Playground.PLAYGROUND_WIDTH - 12, sphere.x);
+        sphere.y = Math.clamp(12, Playground.PLAYGROUND_HEIGHT - 12, sphere.y);
+    }
 }

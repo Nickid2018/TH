@@ -1,5 +1,6 @@
 package io.github.nickid2018.th.system.compute;
 
+import io.github.nickid2018.th.gui.PlayGroundGui;
 import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.bullet.BulletDispenser;
 import io.github.nickid2018.th.system.enemy.Enemy;
@@ -8,9 +9,7 @@ import io.github.nickid2018.tiny2d.math.AABB;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 // 384x448
 public class Playground {
@@ -61,6 +60,12 @@ public class Playground {
         enemies.removeAll(toDelete);
         bulletDispensers.removeAll(toDelete);
         toDelete.clear();
+
+        // --- Test Codes
+        List<HittableItem> hittableItems = playerHitItems();
+        hittableItems.stream().filter(i -> i instanceof Bullet).findFirst().ifPresent(i -> {
+            PlayGroundGui.soundInstanceMissed.play();
+        });
     }
 
     public boolean isItemOutsidePlayground(HittableItem item) {
@@ -81,5 +86,18 @@ public class Playground {
 
     public void dispose(Tickable item) {
         toDelete.add(item);
+    }
+
+    public List<HittableItem> playerHitItems() {
+        List<HittableItem> list = new ArrayList<>();
+        enemies.forEach(e -> {
+            if (player.getHitSphere().orthogonalWith(e.getHitSphere()))
+                list.add(e);
+        });
+        bullets.forEach(d -> {
+            if (player.getHitSphere().orthogonalWith(d.getHitSphere()))
+                list.add(d);
+        });
+        return list;
     }
 }
