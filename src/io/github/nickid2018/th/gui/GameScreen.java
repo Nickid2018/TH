@@ -4,18 +4,15 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import io.github.nickid2018.th.pack.PackManager;
-import io.github.nickid2018.th.system.bullet.Bullet;
-import io.github.nickid2018.th.system.bullet.BulletBasicData;
 import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.th.system.player.Player;
 import io.github.nickid2018.th.system.player.PlayerBasicData;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.gui.GuiRenderContext;
 import io.github.nickid2018.tiny2d.gui.Screen;
+import io.github.nickid2018.tiny2d.gui.components.TextComponent;
 import io.github.nickid2018.tiny2d.window.Window;
 import org.apache.commons.io.IOUtils;
-import org.joml.Random;
-import org.joml.Vector2f;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +20,10 @@ import java.nio.charset.StandardCharsets;
 public class GameScreen extends Screen {
 
     private final PlayGroundGui playGroundGui;
+
+    private TextComponent fpsText;
+    private TextComponent missText;
+    private TextComponent grazeText;
 
     public GameScreen(Window window) throws IOException {
         super(window);
@@ -39,49 +40,23 @@ public class GameScreen extends Screen {
         playground.setPlayer(new Player(playground, playerBasicData) {
         });
 
-        BulletBasicData bulletBasicData = PackManager.createObject(
-                ResourceLocation.fromString("bullets/pellet.json"), BulletBasicData.CODEC);
-
-        BulletBasicData bulletBasicData2 = PackManager.createObject(
-                ResourceLocation.fromString("bullets/tiny_petal.json"), BulletBasicData.CODEC);
-
-        BulletBasicData bulletBasicData3 = PackManager.createObject(
-                ResourceLocation.fromString("bullets/ball.json"), BulletBasicData.CODEC);
-
-        BulletBasicData bulletBasicData4 = PackManager.createObject(
-                ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
-
-        Random random = new Random();
-        for (int i = 0; i < 10000; i++) {
-            playground.addBullet(new SimpleBullet(playground, bulletBasicData, "yellow",
-                    new Vector2f(random.nextInt(Playground.PLAYGROUND_WIDTH), random.nextInt(Playground.PLAYGROUND_HEIGHT))));
-            playground.addBullet(new SimpleBullet(playground, bulletBasicData2, "green",
-                    new Vector2f(random.nextInt(Playground.PLAYGROUND_WIDTH), random.nextInt(Playground.PLAYGROUND_HEIGHT))));
-            playground.addBullet(new SimpleBullet(playground, bulletBasicData3, "red",
-                    new Vector2f(random.nextInt(Playground.PLAYGROUND_WIDTH), random.nextInt(Playground.PLAYGROUND_HEIGHT))));
-            playground.addBullet(new SimpleBullet(playground, bulletBasicData4, "blue",
-                    new Vector2f(random.nextInt(Playground.PLAYGROUND_WIDTH), random.nextInt(Playground.PLAYGROUND_HEIGHT))));
-        }
+        fpsText = TextComponent.create(window, "FPS: 0", 32, 800, 10);
+        missText = TextComponent.create(window, "Miss: 0", 32, 800, 50);
+        grazeText = TextComponent.create(window, "Graze: 0", 32, 800, 90);
 
         setNowFocus(playGroundGui);
-    }
 
-    private static class SimpleBullet extends Bullet {
-
-        public SimpleBullet(Playground playground, BulletBasicData bulletBasicData, String variant, Vector2f position) {
-            super(playground, bulletBasicData, variant, position);
-            renderAngle = (float) Math.random();
-        }
-
-        @Override
-        public void tick(long tickTime) {
-            sphere.move((float) Math.random() * 2 - 1, (float) Math.random() * 2 - 1);
-            renderAngle += 0.1;
-        }
+        addComponent("fps", fpsText);
+        addComponent("miss", missText);
+        addComponent("graze", grazeText);
     }
 
     @Override
     public void render(GuiRenderContext context) {
         playGroundGui.render(context);
+        fpsText.setText("FPS: " + window.getFPS());
+        missText.setText("Miss: " + (3 - playGroundGui.getPlayground().getPlayer().getPlayers()));
+        grazeText.setText("Graze: " + playGroundGui.getPlayground().getPlayer().getGrazeCount());
+        super.render(context);
     }
 }

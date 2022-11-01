@@ -57,7 +57,7 @@ public class SoundInstance {
     }
 
     @AudioThreadOnly
-    private int getState() {
+    public int getState() {
         return !initialized.get() ? AL_STOPPED : alGetSourcei(source, AL_SOURCE_STATE);
     }
 

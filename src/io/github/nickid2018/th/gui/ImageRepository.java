@@ -1,7 +1,5 @@
 package io.github.nickid2018.th.gui;
 
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
 import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.texture.*;
@@ -20,8 +18,8 @@ public class ImageRepository {
     public static Texture MISSING_TEXTURE;
 
     public static TextureDefinition createDefinition(ResourceLocation location) {
-        return TEXTURE_DEFINITION_MAP.computeIfAbsent(location, l -> TextureDefinition.CODEC.parse(
-                new Dynamic<>(JsonOps.INSTANCE, PackManager.createJSON(l))).getOrThrow(false, str -> {})
+        return TEXTURE_DEFINITION_MAP.computeIfAbsent(location,
+                l -> PackManager.createObject(l, TextureDefinition.CODEC)
         );
     }
 
@@ -38,7 +36,7 @@ public class ImageRepository {
             return TEXTURE_MAP.get(imageLocation);
 
         Texture texture;
-        try (InputStream stream = PackManager.createInputStream(imageLocation)){
+        try (InputStream stream = PackManager.createInputStream(imageLocation)) {
             if (stream == null)
                 texture = getMissingTexture();
             else if (isGIF) {
@@ -59,7 +57,7 @@ public class ImageRepository {
     }
 
     public static Texture getTexture(ResourceLocation location) {
-        return TEXTURE_MAP.getOrDefault(location, getMissingTexture());
+        return TEXTURE_MAP.computeIfAbsent(location, l -> getMissingTexture());
     }
 
     public static Texture getMissingTexture() {

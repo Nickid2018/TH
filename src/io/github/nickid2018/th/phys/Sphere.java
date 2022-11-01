@@ -21,6 +21,12 @@ public class Sphere {
         return dx * dx + dy * dy < r * r + another.r * another.r;
     }
 
+    public boolean crossWith(Sphere another) {
+        float dx = another.x - x;
+        float dy = another.y - y;
+        return dx * dx + dy * dy < (r + another.r) * (r + another.r);
+    }
+
     public AABB getOuterAABB() {
         return AABB.newAABB(x - r, y - r, x + r, y + r);
     }
@@ -28,5 +34,9 @@ public class Sphere {
     public void move(float hori, float vert) {
         x += hori;
         y += vert;
+    }
+
+    public Vector2f getPosition() {
+        return new Vector2f(x, y);
     }
 }

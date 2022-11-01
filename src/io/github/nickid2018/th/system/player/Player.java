@@ -10,7 +10,7 @@ import org.joml.Vector2f;
 
 public abstract class Player implements HittableItem {
 
-    public static final float SQRT_2 = (float) Math.sqrt(2);
+    public static final float SQRT_2 = Math.sqrt(2);
 
     protected final Playground playground;
 
@@ -33,6 +33,9 @@ public abstract class Player implements HittableItem {
     @Getter
     @Setter
     protected int players = 3;
+    @Getter
+    @Setter
+    protected int grazeCount = 0;
     // ---- Render And Control ----
     @Getter
     @Setter

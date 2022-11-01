@@ -1,6 +1,8 @@
 package io.github.nickid2018.th.gui;
 
 import io.github.nickid2018.th.pack.PackManager;
+import io.github.nickid2018.th.sound.Sound;
+import io.github.nickid2018.th.sound.SoundRepository;
 import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.compute.Playground;
@@ -14,9 +16,6 @@ import io.github.nickid2018.tiny2d.shader.ShaderProgram;
 import io.github.nickid2018.tiny2d.shader.ShaderSource;
 import io.github.nickid2018.tiny2d.shader.ShaderType;
 import io.github.nickid2018.tiny2d.shader.Uniform;
-import io.github.nickid2018.tiny2d.sound.OggAudioStream;
-import io.github.nickid2018.tiny2d.sound.SoundBuffer;
-import io.github.nickid2018.tiny2d.sound.SoundInstance;
 import io.github.nickid2018.tiny2d.texture.Image;
 import io.github.nickid2018.tiny2d.texture.StaticTexture;
 import io.github.nickid2018.tiny2d.texture.Texture;
@@ -36,7 +35,7 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
     public static final int SPRITE_SIZE = 128;
 
     // test
-    public static SoundInstance soundInstanceMissed;
+    public static Sound soundInstanceMissed;
     public static Texture textureFront;
 
     public static final LazyLoadValue<ShaderProgram> MISSED = new LazyLoadValue<>(() -> {
@@ -55,6 +54,7 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
     });
 
     private final FrameBuffer buffer;
+    @Getter
     private final Playground playground;
 
     @Getter
@@ -71,13 +71,11 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         spriteScaleX = PlayGroundGui.SPRITE_SIZE / (float) Playground.PLAYGROUND_WIDTH * 2 * guiScale;
         spriteScaleY = PlayGroundGui.SPRITE_SIZE / (float) Playground.PLAYGROUND_HEIGHT * 2 * guiScale;
 
-        soundInstanceMissed = SoundInstance.create();
+        soundInstanceMissed = new Sound(SoundRepository.createSoundDefinition(
+                ResourceLocation.fromString("sounds/effect/se_pldead00.json")));
         try {
-            SoundBuffer buffer = new SoundBuffer(new OggAudioStream(PackManager.createInputStream(ResourceLocation.fromString("sounds/effect/se_pldead00.ogg"))));
-            buffer.init();
-            soundInstanceMissed.attachStaticBuffer(buffer);
-
-            textureFront = new StaticTexture(Image.read(PackManager.createInputStream(ResourceLocation.fromString("textures/effect/front.png"))), 4);
+            textureFront = new StaticTexture(Image.read(PackManager.createInputStream(
+                    ResourceLocation.fromString("textures/effect/front.png"))), 4);
             textureFront.update();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -132,8 +130,6 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
             player.setRenderTurnTick(shouldBe);
         }
 
-        if (playground.getTickTime() % 60 == 0) System.out.println(window.getFPS());
-
         ShaderProgram program = Shaders.TEX_COLOR.get();
         program.use();
         program.getUniform("transform").setMatrix4f(getHittableItemMatrix(player));
@@ -145,8 +141,10 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
     }
 
     private void drawInstanced(ShaderProgram program, Bullet bullet, List<Matrix4f> matrix4fs) {
-        if (bullet.getBulletBasicData().isHasTint()) program.getUniform("color").set3fv(bullet.getColor());
-        else program.getUniform("color").set3fv(1, 1, 1);
+        if (bullet.getBulletBasicData().isHasTint())
+            program.getUniform("color").set3fv(bullet.getColor());
+        else
+            program.getUniform("color").set3fv(1, 1, 1);
 
         while (matrix4fs.size() > 100) {
             List<Matrix4f> sub = matrix4fs.subList(0, 100);
@@ -188,6 +186,9 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
                 matrix.rotate(bullet.getRenderAngle(), 0, 0, 1);
             matrices.add(matrix);
         });
+        if (lastBullet[0] != null)
+            drawInstanced(program, lastBullet[0], matrices);
+
         GL11.glDisable(GL11.GL_BLEND);
     }
 
