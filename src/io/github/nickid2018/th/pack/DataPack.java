@@ -19,9 +19,6 @@ public abstract class DataPack implements Closeable {
     @Getter
     protected PackMetadata metadata;
 
-    @Getter
-    protected PackDataList dataList;
-
     public DataPack(String namespace) {
         this.namespace = namespace;
     }
@@ -44,12 +41,6 @@ public abstract class DataPack implements Closeable {
     protected void loadMetadata() throws IOException {
         JsonElement element = getJsonEntry("pack.metadata");
         metadata = PackMetadata.CODEC.parse(new Dynamic<>(JsonOps.INSTANCE, element))
-                .getOrThrow(false, error -> {});
-    }
-
-    protected void loadDataList() throws IOException {
-        JsonElement element = getJsonEntry("pack.list");
-        dataList = PackDataList.CODEC.parse(new Dynamic<>(JsonOps.INSTANCE, element))
                 .getOrThrow(false, error -> {});
     }
 

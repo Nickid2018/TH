@@ -39,4 +39,8 @@ public abstract class Bullet implements HittableItem {
     public Sphere getHitSphere() {
         return sphere;
     }
+
+    public boolean similar(Bullet o) {
+        return bulletBasicData.equals(o.bulletBasicData) && variant.equals(o.variant);
+    }
 }

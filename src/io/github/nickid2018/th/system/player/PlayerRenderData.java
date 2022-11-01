@@ -3,8 +3,8 @@ package io.github.nickid2018.th.system.player;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.gui.ImageRepository;
+import io.github.nickid2018.th.gui.PlayGroundGui;
 import io.github.nickid2018.th.gui.SpriteDefinition;
-import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.tiny2d.buffer.IndexBufferProvider;
 import io.github.nickid2018.tiny2d.buffer.VertexArray;
 import io.github.nickid2018.tiny2d.buffer.VertexArrayBuilder;
@@ -59,10 +59,10 @@ public class PlayerRenderData {
         this.leftSprites = leftSprites;
         this.rightSprites = rightSprites;
 
-        float x1 = renderAABB.getMinX() / Playground.PLAYGROUND_WIDTH * 2;
-        float y1 = renderAABB.getMinY() / Playground.PLAYGROUND_HEIGHT * 2;
-        float x2 = renderAABB.getMaxX() / Playground.PLAYGROUND_WIDTH * 2;
-        float y2 = renderAABB.getMaxY() / Playground.PLAYGROUND_HEIGHT * 2;
+        float x1 = renderAABB.getMinX() / PlayGroundGui.SPRITE_SIZE;
+        float y1 = renderAABB.getMinY() / PlayGroundGui.SPRITE_SIZE;
+        float x2 = renderAABB.getMaxX() / PlayGroundGui.SPRITE_SIZE;
+        float y2 = renderAABB.getMaxY() / PlayGroundGui.SPRITE_SIZE;
 
         staticSprites.forEach(s -> createPlayerRenderData(x1, y1, x2, y2, staticTextures, staticVertexArrays, s));
         leftSprites.forEach(s -> createPlayerRenderData(x1, y1, x2, y2, leftTextures, leftVertexArrays, s));

@@ -4,8 +4,8 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.gui.ImageRepository;
+import io.github.nickid2018.th.gui.PlayGroundGui;
 import io.github.nickid2018.th.gui.SpriteDefinition;
-import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.tiny2d.buffer.IndexBufferProvider;
 import io.github.nickid2018.tiny2d.buffer.VertexArray;
 import io.github.nickid2018.tiny2d.buffer.VertexArrayBuilder;
@@ -70,10 +70,10 @@ public class BulletBasicData implements Comparable<BulletBasicData> {
             StaticTexture staticTexture = (StaticTexture) textureData;
             AABB spriteAABB = entry.getValue().createSpriteAABB(staticTexture);
 
-            float x1 = renderAABB.getMinX() / Playground.PLAYGROUND_WIDTH * 2;
-            float y1 = renderAABB.getMinY() / Playground.PLAYGROUND_HEIGHT * 2;
-            float x2 = renderAABB.getMaxX() / Playground.PLAYGROUND_WIDTH * 2;
-            float y2 = renderAABB.getMaxY() / Playground.PLAYGROUND_HEIGHT * 2;
+            float x1 = renderAABB.getMinX() / PlayGroundGui.SPRITE_SIZE;
+            float y1 = renderAABB.getMinY() / PlayGroundGui.SPRITE_SIZE;
+            float x2 = renderAABB.getMaxX() / PlayGroundGui.SPRITE_SIZE;
+            float y2 = renderAABB.getMaxY() / PlayGroundGui.SPRITE_SIZE;
 
             VertexArrayBuilder builder = new VertexArrayBuilder(VertexAttributeList.TEXTURE_2D, IndexBufferProvider.DEFAULT);
             builder.pos(x1, y1).uv(spriteAABB.minX, spriteAABB.minY).end();

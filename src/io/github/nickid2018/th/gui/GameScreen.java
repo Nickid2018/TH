@@ -39,28 +39,20 @@ public class GameScreen extends Screen {
         playground.setPlayer(new Player(playground, playerBasicData) {
         });
 
-        BulletBasicData bulletBasicData = BulletBasicData.CODEC
-                .parse(new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(IOUtils.toString(
-                        PackManager.createInputStream(ResourceLocation.fromString("bullets/pellet.json")), StandardCharsets.UTF_8))))
-                .getOrThrow(false, error -> {});
+        BulletBasicData bulletBasicData = PackManager.createObject(
+                ResourceLocation.fromString("bullets/pellet.json"), BulletBasicData.CODEC);
 
-        BulletBasicData bulletBasicData2 = BulletBasicData.CODEC
-                .parse(new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(IOUtils.toString(
-                        PackManager.createInputStream(ResourceLocation.fromString("bullets/popcorn.json")), StandardCharsets.UTF_8))))
-                .getOrThrow(false, error -> {});
+        BulletBasicData bulletBasicData2 = PackManager.createObject(
+                ResourceLocation.fromString("bullets/tiny_petal.json"), BulletBasicData.CODEC);
 
-        BulletBasicData bulletBasicData3 = BulletBasicData.CODEC
-                .parse(new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(IOUtils.toString(
-                        PackManager.createInputStream(ResourceLocation.fromString("bullets/ball.json")), StandardCharsets.UTF_8))))
-                .getOrThrow(false, error -> {});
+        BulletBasicData bulletBasicData3 = PackManager.createObject(
+                ResourceLocation.fromString("bullets/ball.json"), BulletBasicData.CODEC);
 
-        BulletBasicData bulletBasicData4 = BulletBasicData.CODEC
-                .parse(new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(IOUtils.toString(
-                        PackManager.createInputStream(ResourceLocation.fromString("bullets/orbs.json")), StandardCharsets.UTF_8))))
-                .getOrThrow(false, error -> {});
+        BulletBasicData bulletBasicData4 = PackManager.createObject(
+                ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
 
         Random random = new Random();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10000; i++) {
             playground.addBullet(new SimpleBullet(playground, bulletBasicData, "yellow",
                     new Vector2f(random.nextInt(Playground.PLAYGROUND_WIDTH), random.nextInt(Playground.PLAYGROUND_HEIGHT))));
             playground.addBullet(new SimpleBullet(playground, bulletBasicData2, "green",
@@ -78,10 +70,13 @@ public class GameScreen extends Screen {
 
         public SimpleBullet(Playground playground, BulletBasicData bulletBasicData, String variant, Vector2f position) {
             super(playground, bulletBasicData, variant, position);
+            renderAngle = (float) Math.random();
         }
 
         @Override
         public void tick(long tickTime) {
+            sphere.move((float) Math.random() * 2 - 1, (float) Math.random() * 2 - 1);
+            renderAngle += 0.1;
         }
     }
 

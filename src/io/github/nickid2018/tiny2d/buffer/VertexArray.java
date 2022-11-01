@@ -8,7 +8,7 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL31.*;
 
 public class VertexArray {
 
@@ -76,6 +76,13 @@ public class VertexArray {
     public void draw() {
         bind();
         glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
+        unbind();
+    }
+
+    @RenderThreadOnly
+    public void drawInstanced(int count) {
+        bind();
+        glDrawElementsInstanced(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0, count);
         unbind();
     }
 

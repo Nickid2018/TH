@@ -2,6 +2,7 @@ package io.github.nickid2018.th.gui;
 
 import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.system.bullet.Bullet;
+import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.th.system.player.Player;
 import io.github.nickid2018.th.util.ResourceLocation;
@@ -22,17 +23,17 @@ import io.github.nickid2018.tiny2d.texture.Texture;
 import io.github.nickid2018.tiny2d.util.LazyLoadValue;
 import io.github.nickid2018.tiny2d.window.Window;
 import lombok.Getter;
-import org.joml.Matrix2f;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayGroundGui extends RenderComponent implements KeyboardInput {
+
+    public static final int SPRITE_SIZE = 128;
 
     // test
     public static SoundInstance soundInstanceMissed;
@@ -59,24 +60,37 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
     @Getter
     private final int guiScale;
 
+    private final float spriteScaleX;
+    private final float spriteScaleY;
+
     public PlayGroundGui(Window window, int x, int y, int width, int height, Playground playground, int guiScale) {
         super(window, x, y, width, height);
         this.playground = playground;
         this.guiScale = guiScale;
         buffer = new FrameBuffer(Playground.PLAYGROUND_WIDTH * guiScale, Playground.PLAYGROUND_HEIGHT * guiScale);
+        spriteScaleX = PlayGroundGui.SPRITE_SIZE / (float) Playground.PLAYGROUND_WIDTH * 2 * guiScale;
+        spriteScaleY = PlayGroundGui.SPRITE_SIZE / (float) Playground.PLAYGROUND_HEIGHT * 2 * guiScale;
+
         soundInstanceMissed = SoundInstance.create();
         try {
-            SoundBuffer buffer = new SoundBuffer(new OggAudioStream(PackManager.createInputStream(
-                    ResourceLocation.fromString("sounds/effect/se_pldead00.ogg"))));
+            SoundBuffer buffer = new SoundBuffer(new OggAudioStream(PackManager.createInputStream(ResourceLocation.fromString("sounds/effect/se_pldead00.ogg"))));
             buffer.init();
             soundInstanceMissed.attachStaticBuffer(buffer);
 
-            textureFront = new StaticTexture(Image.read(PackManager.createInputStream(
-                    ResourceLocation.fromString("textures/effect/front.png"))), 4);
+            textureFront = new StaticTexture(Image.read(PackManager.createInputStream(ResourceLocation.fromString("textures/effect/front.png"))), 4);
             textureFront.update();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Matrix4f getHittableItemMatrix(HittableItem item) {
+        Matrix4f matrix = new Matrix4f();
+        float x = item.getHitSphere().x / Playground.PLAYGROUND_WIDTH * 2 - 1;
+        float y = item.getHitSphere().y / Playground.PLAYGROUND_HEIGHT * 2 - 1;
+        matrix.translate(x, y, 0);
+        matrix.scale(spriteScaleX, spriteScaleY, 1);
+        return matrix;
     }
 
     @Override
@@ -93,11 +107,6 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         Player player = playground.getPlayer();
-        Matrix4f matrix = new Matrix4f();
-        float x = player.getHitSphere().x / Playground.PLAYGROUND_WIDTH * 2 - 1;
-        float y = player.getHitSphere().y / Playground.PLAYGROUND_HEIGHT * 2 - 1;
-        matrix.translate(x, y, 0);
-        matrix.scale(guiScale, guiScale, 1);
 
         int renderTurnTick = player.getRenderTurnTick();
         Texture texture;
@@ -109,23 +118,25 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
             array = player.getBasicData().renderData().getStaticVertexArrays().get(index);
         } else if (renderTurnTick > 0) {
             List<Texture> textures = player.getBasicData().renderData().getRightTextures();
-            int shouldBe = renderTurnTick % (textures.size() * 2);
-            int index = (renderTurnTick / 2) % textures.size();
+            int shouldBe = Math.min(renderTurnTick, textures.size() * 2 - 2);
+            int index = shouldBe / 2;
             texture = textures.get(index);
             array = player.getBasicData().renderData().getRightVertexArrays().get(index);
             player.setRenderTurnTick(shouldBe);
         } else {
             List<Texture> textures = player.getBasicData().renderData().getLeftTextures();
-            int shouldBe = renderTurnTick % (textures.size() * 2);
-            int index = Math.abs((renderTurnTick / 2) % textures.size());
+            int shouldBe = Math.max(renderTurnTick, -textures.size() * 2 + 2);
+            int index = Math.abs(shouldBe / 2);
             texture = textures.get(index);
             array = player.getBasicData().renderData().getLeftVertexArrays().get(index);
             player.setRenderTurnTick(shouldBe);
         }
 
+        if (playground.getTickTime() % 60 == 0) System.out.println(window.getFPS());
+
         ShaderProgram program = Shaders.TEX_COLOR.get();
         program.use();
-        program.getUniform("transform").setMatrix4f(matrix);
+        program.getUniform("transform").setMatrix4f(getHittableItemMatrix(player));
         program.getUniform("color").set3fv(1, 1, 1);
         texture.bind();
         array.draw();
@@ -133,31 +144,49 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         GL11.glDisable(GL11.GL_BLEND);
     }
 
+    private void drawInstanced(ShaderProgram program, Bullet bullet, List<Matrix4f> matrix4fs) {
+        if (bullet.getBulletBasicData().isHasTint()) program.getUniform("color").set3fv(bullet.getColor());
+        else program.getUniform("color").set3fv(1, 1, 1);
+
+        while (matrix4fs.size() > 100) {
+            List<Matrix4f> sub = matrix4fs.subList(0, 100);
+            for (int i = 0; i < 100; i++)
+                program.getUniform("transform[" + i + "]").setMatrix4f(sub.get(i));
+            bullet.getBulletBasicData().getTexture(bullet.getVariant()).bind();
+            bullet.getBulletBasicData().getVertexArray(bullet.getVariant()).drawInstanced(100);
+            sub.clear();
+        }
+
+        for (int i = 0; i < matrix4fs.size(); i++)
+            program.getUniform("transform[" + i + "]").setMatrix4f(matrix4fs.get(i));
+        bullet.getBulletBasicData().getTexture(bullet.getVariant()).bind();
+        bullet.getBulletBasicData().getVertexArray(bullet.getVariant()).drawInstanced(matrix4fs.size());
+        matrix4fs.clear();
+    }
+
     private void renderBullets(GuiRenderContext context) {
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        playground.getBullets().stream()
-                .sorted(Comparator.comparing(Bullet::getBulletBasicData))
-                .forEach(bullet -> {
-            Matrix4f matrix = new Matrix4f();
-            float x = bullet.getHitSphere().x / Playground.PLAYGROUND_WIDTH * 2 - 1;
-            float y = bullet.getHitSphere().y / Playground.PLAYGROUND_HEIGHT * 2 - 1;
-
+        ShaderProgram program = Shaders.TEX_COLOR_INSTANCED.get();
+        program.use();
+        List<Matrix4f> matrices = new ArrayList<>();
+        Bullet[] lastBullet = {null};
+        playground.getBullets().stream().sorted((b1, b2) -> {
+            int i = b1.getBulletBasicData().compareTo(b2.getBulletBasicData());
+            if (i == 0)
+                return b1.getVariant().compareTo(b2.getVariant());
+            return i;
+        }).forEach(bullet -> {
+            if (lastBullet[0] == null)
+                lastBullet[0] = bullet;
+            else if (!lastBullet[0].similar(bullet)) {
+                drawInstanced(program, lastBullet[0], matrices);
+                lastBullet[0] = bullet;
+            }
+            Matrix4f matrix = getHittableItemMatrix(bullet);
             if (bullet.getBulletBasicData().isHasRenderAngle())
                 matrix.rotate(bullet.getRenderAngle(), 0, 0, 1);
-            matrix.translate(x, y, 0);
-            matrix.scale(guiScale, guiScale, 1);
-
-            ShaderProgram program = Shaders.TEX_COLOR.get();
-            program.use();
-            program.getUniform("transform").setMatrix4f(matrix);
-            if (bullet.getBulletBasicData().isHasTint())
-                program.getUniform("color").set3fv(bullet.getColor());
-            else
-                program.getUniform("color").set3fv(1, 1, 1);
-
-            bullet.getBulletBasicData().getTexture(bullet.getVariant()).bind();
-            bullet.getBulletBasicData().getVertexArray(bullet.getVariant()).draw();
+            matrices.add(matrix);
         });
         GL11.glDisable(GL11.GL_BLEND);
     }
@@ -167,11 +196,9 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         if (player.isSlowMode()) {
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            Matrix4f matrix = new Matrix4f();
-            float x = player.getHitSphere().x / Playground.PLAYGROUND_WIDTH * 2 - 1;
-            float y = player.getHitSphere().y / Playground.PLAYGROUND_HEIGHT * 2 - 1;
-            matrix.translate(x, y, 0);
-            matrix.scale(guiScale, guiScale, 1);
+
+            Matrix4f matrix = getHittableItemMatrix(player);
+            matrix.rotate((float) Math.toRadians(playground.getTickTime() * 2), 0, 0, 1);
 
             ShaderProgram program = Shaders.TEX_COLOR.get();
             program.use();
@@ -180,24 +207,14 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
 
             textureFront.bind();
 
-            Vector2f x1y1 = new Vector2f(-32f, -32f);
-            Vector2f x1y2 = new Vector2f(-32f, 32f);
-            Vector2f x2y2 = new Vector2f(32f, 32f);
-            Vector2f x2y1 = new Vector2f(32f, -32f);
-
-            Matrix2f transform = new Matrix2f();
-            transform.rotate((float) Math.toRadians(playground.getTickTime() * 2));
-            x1y1.mul(transform);
-            x1y2.mul(transform);
-            x2y2.mul(transform);
-            x2y1.mul(transform);
-
             VertexArrayBuilder builder = new VertexArrayBuilder(VertexAttributeList.TEXTURE_2D, IndexBufferProvider.DEFAULT);
-            builder.pos(x1y1.x / Playground.PLAYGROUND_WIDTH, x1y1.y / Playground.PLAYGROUND_HEIGHT).uv(0, 0).end();
-            builder.pos(x2y1.x / Playground.PLAYGROUND_WIDTH, x2y1.y / Playground.PLAYGROUND_HEIGHT).uv(1, 0).end();
-            builder.pos(x1y2.x / Playground.PLAYGROUND_WIDTH, x1y2.y / Playground.PLAYGROUND_HEIGHT).uv(0, 1).end();
-            builder.pos(x2y2.x / Playground.PLAYGROUND_WIDTH, x2y2.y / Playground.PLAYGROUND_HEIGHT).uv(1, 1).end();
-            builder.build().draw();
+            builder.pos(-0.125f, -0.125f).uv(0, 0).end();
+            builder.pos(0.125f, -0.125f).uv(1, 0).end();
+            builder.pos(-0.125f, 0.125f).uv(0, 1).end();
+            builder.pos(0.125f, 0.125f).uv(1, 1).end();
+            VertexArray array = builder.build();
+            array.draw();
+            array.destroy();
             GL11.glDisable(GL11.GL_BLEND);
         }
     }
@@ -258,8 +275,7 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
             case GLFW.GLFW_KEY_DOWN -> playground.getPlayer().getMoveFlag() | 8;
             default -> playground.getPlayer().getMoveFlag();
         });
-        if (key == GLFW.GLFW_KEY_LEFT_SHIFT)
-            playground.getPlayer().setSlowMode(true);
+        if (key == GLFW.GLFW_KEY_LEFT_SHIFT) playground.getPlayer().setSlowMode(true);
     }
 
     @Override
@@ -271,7 +287,6 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
             case GLFW.GLFW_KEY_DOWN -> playground.getPlayer().getMoveFlag() & ~8;
             default -> playground.getPlayer().getMoveFlag();
         });
-        if (key == GLFW.GLFW_KEY_LEFT_SHIFT)
-            playground.getPlayer().setSlowMode(false);
+        if (key == GLFW.GLFW_KEY_LEFT_SHIFT) playground.getPlayer().setSlowMode(false);
     }
 }

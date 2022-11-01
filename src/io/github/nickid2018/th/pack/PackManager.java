@@ -3,6 +3,9 @@ package io.github.nickid2018.th.pack;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonParser;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import io.github.nickid2018.th.util.ResourceLocation;
 import it.unimi.dsi.fastutil.Pair;
 
@@ -53,5 +56,9 @@ public class PackManager {
         } catch (IOException ignored) {
             return JsonNull.INSTANCE;
         }
+    }
+
+    public static <T> T createObject(ResourceLocation location, Codec<T> codec) {
+        return codec.parse(new Dynamic<>(JsonOps.INSTANCE, createJSON(location))).getOrThrow(false, error -> {});
     }
 }

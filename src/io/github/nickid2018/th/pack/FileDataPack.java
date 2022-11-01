@@ -9,9 +9,10 @@ public class FileDataPack extends DataPack {
 
     private final File root;
 
-    public FileDataPack(File root) {
+    public FileDataPack(File root) throws IOException {
         super(root.getName());
         this.root = root;
+        loadMetadata();
     }
 
     @Override

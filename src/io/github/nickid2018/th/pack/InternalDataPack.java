@@ -8,7 +8,6 @@ public class InternalDataPack extends DataPack {
     public InternalDataPack() throws IOException {
         super("internal");
         loadMetadata();
-        loadDataList();
     }
 
     @Override

@@ -18,7 +18,6 @@ public class ZipFileDataPack extends DataPack {
         super(zipFile.getName());
         this.zipFile = new ZipFile(zipFile);
         loadMetadata();
-        loadDataList();
     }
 
     @Override
