@@ -21,9 +21,9 @@ public class GameScreen extends Screen {
 
     private final PlayGroundGui playGroundGui;
 
-    private TextComponent fpsText;
-    private TextComponent missText;
-    private TextComponent grazeText;
+    private final TextComponent fpsText;
+    private final TextComponent missText;
+    private final TextComponent grazeText;
 
     public GameScreen(Window window) throws IOException {
         super(window);
@@ -37,8 +37,7 @@ public class GameScreen extends Screen {
                         PackManager.createInputStream(ResourceLocation.fromString("players/player_0.json")), StandardCharsets.UTF_8))))
                 .getOrThrow(false, error -> {});
 
-        playground.setPlayer(new Player(playground, playerBasicData) {
-        });
+        playground.setPlayer(new Player(playground, playerBasicData) {});
 
         fpsText = TextComponent.create(window, "FPS: 0", 32, 800, 10);
         missText = TextComponent.create(window, "Miss: 0", 32, 800, 50);

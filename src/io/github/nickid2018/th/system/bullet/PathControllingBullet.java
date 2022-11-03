@@ -24,5 +24,6 @@ public class PathControllingBullet extends Bullet {
             lastTick = lifeTime;
         }
         currentPath.tick(lifeTime - lastTick, this);
+        super.tick(tickTime);
     }
 }

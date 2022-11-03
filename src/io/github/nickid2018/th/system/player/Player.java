@@ -12,6 +12,7 @@ public abstract class Player implements HittableItem {
 
     public static final float SQRT_2 = Math.sqrt(2);
 
+    @Getter
     protected final Playground playground;
 
     @Getter

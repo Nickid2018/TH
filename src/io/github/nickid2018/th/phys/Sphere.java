@@ -36,7 +36,17 @@ public class Sphere {
         y += vert;
     }
 
+    public void moveTo(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public Vector2f getPosition() {
         return new Vector2f(x, y);
+    }
+
+    public void moveTo(Vector2f position) {
+        this.x = position.x;
+        this.y = position.y;
     }
 }

@@ -3,10 +3,17 @@ package io.github.nickid2018.th.util;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
+import org.joml.Vector2f;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class CodecUtil {
+
+    public static final Codec<Vector2f> VECTOR_2F_CODEC = Codec.FLOAT.listOf().xmap(
+            list -> new Vector2f(list.get(0), list.get(1)),
+            vector2f -> List.of(vector2f.x, vector2f.y)
+    );
 
     public static final Consumer<String> NOP = s -> {};
 
