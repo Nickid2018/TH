@@ -83,7 +83,7 @@ public class FunctionVector2f extends WithArgsFunctionProvider<Vector2f> impleme
             "subtract", Vector2fProvider.class, Vector2fProvider.class) {
         @Override
         protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
-            return ((Vector2f) arguments.get(0).getValue(item)).add((Vector2f) arguments.get(1).getValue(item));
+            return ((Vector2f) arguments.get(0).getValue(item)).sub((Vector2f) arguments.get(1).getValue(item));
         }
     };
 

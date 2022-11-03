@@ -19,10 +19,12 @@ public abstract class ValueFunction<T> {
 
     public T compute(HittableItem item, List<ValueProvider<?>> arguments) {
         if (arguments.size() != this.arguments.length)
-            throw new IllegalArgumentException("The number of arguments is not correct");
+            throw new IllegalArgumentException("%s: The number of arguments is not correct! Should be %d but found %d."
+                    .formatted(name, this.arguments.length, arguments.size()));
         for (int i = 0; i < arguments.size(); i++) {
             if (!this.arguments[i].isInstance(arguments.get(i)))
-                throw new IllegalArgumentException("The type of argument " + i + " is not correct");
+                throw new IllegalArgumentException("%s: The type of argument %d is not correct! Should be %s but found %s."
+                        .formatted(name, i, this.arguments[i].getSimpleName(), arguments.get(i).getClass().getSimpleName()));
         }
         return getValue(item, arguments);
     }

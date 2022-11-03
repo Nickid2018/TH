@@ -49,7 +49,7 @@ public interface ValueProvider<T> {
                 {
                     "type": "vec2",
                     "compute_type": "function",
-                    "function": "add",
+                    "function": "subtract",
                     "arguments": [
                         [1, 2],
                         {
@@ -57,8 +57,7 @@ public interface ValueProvider<T> {
                             "compute_type": "function",
                             "function": "with_angle",
                             "arguments": [
-                                0.44,
-                                0.88
+                                3.1415926
                             ]
                         }
                     ]
