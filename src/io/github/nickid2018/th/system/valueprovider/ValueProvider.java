@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.valueprovider.floating.ConstantFloat;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
@@ -18,7 +19,9 @@ import io.github.nickid2018.th.util.CodecUtil;
 public interface ValueProvider<T> {
 
     Codec<ValueProvider<?>> CODEC = Codec.either(
-            Codec.INT,
+            RecordCodecBuilder.<ConstantInt>create(app -> app.group(
+                    Codec.INT.fieldOf("int").forGetter(ConstantInt::value) // Need extra data
+            ).apply(app, ConstantInt::new)),
             Codec.either(
                     Codec.FLOAT,
                     Codec.either(
@@ -26,7 +29,7 @@ public interface ValueProvider<T> {
                             Codec.STRING.<ValueProvider<?>>dispatch(ValueProvider::getValueProviderType, ValueProvider::getCodec)
                     ).<ValueProvider<?>>xmap(e -> e.map(ConstantVector2f::new, v -> v), Either::right)
             ).<ValueProvider<?>>xmap(e -> e.map(ConstantFloat::new, v -> v), Either::right)
-    ).<ValueProvider<?>>xmap(e -> e.map(ConstantInt::new, v -> v), Either::right);
+    ).xmap(e -> e.map(v -> v, v -> v), Either::right);
 
     static Codec<? extends ValueProvider<?>> getCodec(String s) {
         return switch (s) {
@@ -48,23 +51,14 @@ public interface ValueProvider<T> {
                     "compute_type": "function",
                     "function": "add",
                     "arguments": [
-                        {
-                            "type": "vec2",
-                            "compute_type": "constant",
-                            "x": 1,
-                            "y": 2
-                        },
+                        [1, 2],
                         {
                             "type": "vec2",
                             "compute_type": "function",
-                            "function": "normalize",
+                            "function": "with_angle",
                             "arguments": [
-                                {
-                                    "type": "vec2",
-                                    "compute_type": "constant",
-                                    "x": 3,
-                                    "y": 4
-                                }
+                                0.44,
+                                0.88
                             ]
                         }
                     ]

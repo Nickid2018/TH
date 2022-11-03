@@ -8,15 +8,21 @@ import lombok.Getter;
 
 public record ConstantInt(@Getter int value) implements IntProvider {
 
+    public static final Codec<ConstantInt> CONSTANT_CODEC = RecordCodecBuilder.<ConstantInt>create(app -> app.group(
+            Codec.INT.fieldOf("value").forGetter(ConstantInt::value)
+    ).apply(app, ConstantInt::new));
+
     public static final Codec<ConstantInt> CODEC = Codec.either(
-            Codec.INT,
-            RecordCodecBuilder.<ConstantInt>create(app -> app.group(
-                    Codec.INT.fieldOf("value").forGetter(ConstantInt::value)
-            ).apply(app, ConstantInt::new))
+            Codec.INT, CONSTANT_CODEC
     ).xmap(e -> e.map(ConstantInt::new, v -> v), Either::right);
 
     @Override
     public Integer getValue(HittableItem item) {
         return value;
+    }
+
+    @Override
+    public String getComputeType() {
+        return "constant";
     }
 }
