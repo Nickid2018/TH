@@ -17,7 +17,6 @@ public abstract class Player implements HittableItem {
 
     @Getter
     private final PlayerBasicData basicData;
-    @Getter
     protected final Sphere sphere;
 
     // ---- Miss ----

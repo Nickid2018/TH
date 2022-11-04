@@ -1,5 +1,8 @@
 package io.github.nickid2018.th.system.compute;
 
+import com.google.gson.JsonParser;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import io.github.nickid2018.th.gui.PlayGroundGui;
 import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.phys.Sphere;
@@ -8,14 +11,11 @@ import io.github.nickid2018.th.system.bullet.BulletBasicData;
 import io.github.nickid2018.th.system.bullet.BulletDispenser;
 import io.github.nickid2018.th.system.bullet.PathControllingBullet;
 import io.github.nickid2018.th.system.bullet.path.BulletPath;
-import io.github.nickid2018.th.system.bullet.path.StraightBulletPath;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.player.Player;
-import io.github.nickid2018.th.system.valueprovider.floating.ConstantFloat;
-import io.github.nickid2018.th.system.valueprovider.vector.ConstantVector2f;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.math.AABB;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Vector2f;
@@ -55,6 +55,7 @@ public class Playground {
     protected Random random = new Random();
 
     BulletBasicData bulletBasicData, bulletBasicData2;
+    Long2ObjectMap<BulletPath> map;
 
     public Playground() {
         playgroundBulletAABB = AABB.newAABB(-20, -20, PLAYGROUND_WIDTH + 20, PLAYGROUND_HEIGHT + 20);
@@ -63,6 +64,29 @@ public class Playground {
                 ResourceLocation.fromString("bullets/ball.json"), BulletBasicData.CODEC);
         bulletBasicData2 = PackManager.createObject(
                 ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
+
+        String json = """
+                {
+                    "0": {
+                        "type": "fixed_path",
+                        "time": 100,
+                        "function": {
+                            "x_function": "internal:bezier_2",
+                            "y_function": "internal:bezier_2",
+                            "control_points": [
+                                [200, 100],
+                                {
+                                    "compute_type": "no_arg_function",
+                                    "action": "player"
+                                }
+                            ]
+                        }
+                    }
+                }
+                """;
+        map = PathControllingBullet.PATH_LIST_CODEC.parse(
+                new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(json))
+        ).getOrThrow(false, System.out::println);
     }
 
     public void update() {
@@ -70,18 +94,11 @@ public class Playground {
 
         player.tick(tickTime);
 
-        if (tickTime % 16 == 0 && tickTime % 160 > 80 * ((4000 - tickTime) / 4000.0)) {
-            float start = tickTime % 32 == 0 ? (float) (Math.PI / 120) : 0;
-            for (int i = 0; i < 120; i++) {
-                Long2ObjectOpenHashMap<BulletPath> p = new Long2ObjectOpenHashMap<>();
-//                p.put(0, new StraightBulletPath(-1, random.nextFloat(2, 3),
-//                        Either.left(new Vector2f((float) Math.cos(baseAngle), (float) Math.sin(baseAngle)))));
-                p.put(0, new StraightBulletPath(-1, new ConstantFloat(1),
-                        new ConstantVector2f(new Vector2f((float) Math.cos(start), (float) Math.sin(start)))));
-                PathControllingBullet bullet = new PathControllingBullet(this, bulletBasicData2, "purple",
-                        new Vector2f(PLAYGROUND_WIDTH / 2f, PLAYGROUND_HEIGHT / 4f), p);
+        if (tickTime % 160 > 80 * ((4000 - tickTime) / 4000.0)) {
+            for (int i = 0; i < 500; i++) {
+                PathControllingBullet bullet = new PathControllingBullet(this, bulletBasicData2, "green",
+                        new Vector2f(random.nextInt(PLAYGROUND_WIDTH), -12), map);
                 addBullet(bullet);
-                start += Math.PI / 60;
             }
         }
 

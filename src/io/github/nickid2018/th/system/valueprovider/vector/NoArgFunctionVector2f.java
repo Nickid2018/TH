@@ -1,24 +1,78 @@
 package io.github.nickid2018.th.system.valueprovider.vector;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.compute.HittableItem;
+import io.github.nickid2018.th.system.valueprovider.NoArgFunction;
+import io.github.nickid2018.th.system.valueprovider.ValueFunction;
+import io.github.nickid2018.th.system.valueprovider.ValueProvider;
+import org.joml.Math;
 import org.joml.Vector2f;
 
-public record NoArgFunctionVector2f(String actionKey) implements Vector2fProvider {
+import java.util.List;
+import java.util.Map;
 
-    public static final Codec<NoArgFunctionVector2f> NO_ARG_CODEC = RecordCodecBuilder.create(app -> app.group(
-            Codec.STRING.fieldOf("action").forGetter(NoArgFunctionVector2f::actionKey)
-    ).apply(app, NoArgFunctionVector2f::new));
+public class NoArgFunctionVector2f extends NoArgFunction<Vector2f> implements Vector2fProvider {
 
-    public static final Codec<NoArgFunctionVector2f> CODEC = Codec.either(
-            Codec.STRING, NO_ARG_CODEC
-    ).xmap(e -> e.map(NoArgFunctionVector2f::new, v -> v), Either::right);
+    public static final ValueFunction<Vector2f> ZERO = new ValueFunction<>("zero") {
+        @Override
+        protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
+            return new Vector2f();
+        }
+    };
 
-    @Override
-    public Vector2f getValue(HittableItem item) {
-        return null;
+    public static final ValueFunction<Vector2f> RANDOM = new ValueFunction<>("random") {
+        @Override
+        protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
+            float angle = (float) (Math.random() * 2 * Math.PI);
+            return new Vector2f(Math.cos(angle), Math.sin(angle));
+        }
+    };
+
+    public static final ValueFunction<Vector2f> THIS_POSITION = new ValueFunction<>("this") {
+        @Override
+        protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
+            return new Vector2f(item.getHitSphere().getPosition());
+        }
+    };
+
+    public static final ValueFunction<Vector2f> PLAYER_POSITION = new ValueFunction<>("player") {
+        @Override
+        protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
+            return new Vector2f(item.getPlayground().getPlayer().getHitSphere().getPosition());
+        }
+    };
+
+    public static final ValueFunction<Vector2f> BULLET_ANGLE = new ValueFunction<>("bullet_angle") {
+        @Override
+        protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
+            if (item instanceof Bullet bullet) {
+                float angle = bullet.getAngle();
+                return new Vector2f(Math.cos(angle), Math.sin(angle));
+            } else
+                throw new IllegalArgumentException("The item is not a bullet");
+        }
+    };
+
+    public static final ValueFunction<Vector2f> TO_PLAYER_VEC = new ValueFunction<>("to_player") {
+        @Override
+        protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
+            Vector2f me = item.getHitSphere().getPosition();
+            Vector2f player = item.getPlayground().getPlayer().getHitSphere().getPosition();
+            return player.sub(me);
+        }
+    };
+
+    public static final Map<String, ValueFunction<Vector2f>> FUNCTIONS = ValueProvider.getFunctionMap(
+            ZERO, RANDOM, THIS_POSITION, PLAYER_POSITION, BULLET_ANGLE, TO_PLAYER_VEC
+    );
+
+    public static final Codec<NoArgFunctionVector2f> NO_ARG_CODEC = noArgCodec(NoArgFunctionVector2f::new, FUNCTIONS);
+
+    public static final Codec<NoArgFunctionVector2f> CODEC = codec(NO_ARG_CODEC, NoArgFunctionVector2f::new, FUNCTIONS);
+
+    public NoArgFunctionVector2f(ValueFunction<Vector2f> actionKey) {
+        super(actionKey);
     }
 
     @Override

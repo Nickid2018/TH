@@ -2,7 +2,7 @@ package io.github.nickid2018.th.system.bullet.path;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.nickid2018.th.system.bullet.Bullet;
+import io.github.nickid2018.th.system.bullet.PathControllingBullet;
 import io.github.nickid2018.th.system.valueprovider.AxisPositionFunction;
 import io.github.nickid2018.th.system.valueprovider.AxisPositionFunctions;
 import io.github.nickid2018.th.system.valueprovider.vector.Vector2fProvider;
@@ -25,10 +25,6 @@ public class BulletPathFunction {
     private final AxisPositionFunction yFunction;
     private final List<Vector2fProvider> controlPoints;
 
-    private final List<Vector2f> controlPointsList = new ArrayList<>();
-
-    private boolean filledFirstPos = false;
-
     public BulletPathFunction(AxisPositionFunction xFunction,
                               AxisPositionFunction yFunction,
                               List<Vector2fProvider> controlPoints) {
@@ -37,16 +33,17 @@ public class BulletPathFunction {
         this.controlPoints = controlPoints;
     }
 
-    public Vector2f getPosition(float t, Bullet bullet) {
-        if (!filledFirstPos) {
-            filledFirstPos = true;
-            controlPointsList.add(bullet.getHitSphere().getPosition());
-            controlPoints.stream()
-                    .map(v -> v.getValue(bullet))
-                    .forEach(controlPointsList::add);
-        }
-        float x = xFunction.getValue(t, i -> controlPointsList.get(i).x);
-        float y = yFunction.getValue(t, i -> controlPointsList.get(i).y);
+    public Object[] createArguments(PathControllingBullet bullet) {
+        List<Vector2f> list = new ArrayList<>();
+        list.add(bullet.getHitSphere().getPosition());
+        for (Vector2fProvider provider : controlPoints)
+            list.add(provider.getValue(bullet));
+        return list.toArray();
+    }
+
+    public Vector2f getPosition(float t, PathControllingBullet bullet) {
+        float x = xFunction.getValue(t, i -> ((Vector2f) bullet.getStoredArgs()[i]).x);
+        float y = yFunction.getValue(t, i -> ((Vector2f) bullet.getStoredArgs()[i]).y);
         return new Vector2f(x, y);
     }
 }

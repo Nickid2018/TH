@@ -21,11 +21,10 @@ public abstract class ValueFunction<T> {
         if (arguments.size() != this.arguments.length)
             throw new IllegalArgumentException("%s: The number of arguments is not correct! Should be %d but found %d."
                     .formatted(name, this.arguments.length, arguments.size()));
-        for (int i = 0; i < arguments.size(); i++) {
+        for (int i = 0; i < arguments.size(); i++)
             if (!this.arguments[i].isInstance(arguments.get(i)))
                 throw new IllegalArgumentException("%s: The type of argument %d is not correct! Should be %s but found %s."
                         .formatted(name, i, this.arguments[i].getSimpleName(), arguments.get(i).getClass().getSimpleName()));
-        }
         return getValue(item, arguments);
     }
 

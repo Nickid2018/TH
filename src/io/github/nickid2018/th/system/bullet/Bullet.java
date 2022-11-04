@@ -24,7 +24,7 @@ public abstract class Bullet implements HittableItem {
     protected long lifeTime;
 
     @Getter
-    protected float renderAngle;
+    protected float angle;
 
     @Getter
     protected Vector3f color;
