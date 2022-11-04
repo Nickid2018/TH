@@ -1,4 +1,4 @@
-package io.github.nickid2018.th.system.valueprovider;
+package io.github.nickid2018.th.system.valueprovider.axisposition;
 
 import com.mojang.serialization.Codec;
 import io.github.nickid2018.th.util.ResourceLocation;
@@ -8,13 +8,13 @@ import java.util.Map;
 
 public class AxisPositionFunctions {
 
-    public static final Codec<AxisPositionFunction> CODEC =
+    public static final Codec<AxisPositionFunction> REF_CODEC =
             ResourceLocation.CODEC.xmap(AxisPositionFunctions::createValueFunction, AxisPositionFunctions::getLocation);
 
     private static final Map<ResourceLocation, AxisPositionFunction> VALUE_FUNCTION_MAP = new HashMap<>();
 
     public static void registerValueFunction(ResourceLocation location, AxisPositionFunction function) {
-        VALUE_FUNCTION_MAP.put(location, function);
+        VALUE_FUNCTION_MAP.put(location.normalize(), function);
     }
 
     public static AxisPositionFunction getValueFunction(ResourceLocation location) {
@@ -25,7 +25,9 @@ public class AxisPositionFunctions {
         AxisPositionFunction function = getValueFunction(location);
         if (function != null)
             return function;
-        return null;
+        function = new UserDefinedAxisPositionFunction(location);
+        registerValueFunction(location, function);
+        return function;
     }
 
     public static ResourceLocation getLocation(AxisPositionFunction function) {

@@ -1,13 +1,8 @@
 package io.github.nickid2018.th.system.valueprovider;
 
-import com.google.gson.JsonParser;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.nickid2018.th.system.bullet.PathControllingBullet;
-import io.github.nickid2018.th.system.bullet.path.BulletPath;
 import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.valueprovider.floating.ConstantFloat;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
@@ -16,7 +11,6 @@ import io.github.nickid2018.th.system.valueprovider.integer.IntProvider;
 import io.github.nickid2018.th.system.valueprovider.vector.ConstantVector2f;
 import io.github.nickid2018.th.system.valueprovider.vector.Vector2fProvider;
 import io.github.nickid2018.th.util.CodecUtil;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,61 +50,4 @@ public interface ValueProvider<T> {
     String getValueProviderType();
 
     T getValue(HittableItem item);
-
-    static void main(String[] args) {
-//        String json = """
-//                {
-//                    "type": "vec2",
-//                    "compute_type": "function",
-//                    "function": "subtract",
-//                    "arguments": [
-//                        {
-//                            "type": "vec2",
-//                            "compute_type": "no_arg_function",
-//                            "action": "random"
-//                        },
-//                        {
-//                            "type": "vec2",
-//                            "compute_type": "function",
-//                            "function": "with_angle",
-//                            "arguments": [
-//                                3.1415926
-//                            ]
-//                        }
-//                    ]
-//                }
-//                """;
-//        JsonElement element = JsonParser.parseString(json);
-//        ValueProvider<?> provider = CODEC.parse(new Dynamic<>(JsonOps.INSTANCE, element))
-//                .getOrThrow(false, System.out::println);
-//        System.out.println(provider.getValue(null));
-
-        String json = """
-                {
-                    "0": {
-                        "type": "fixed_path",
-                        "time": 100,
-                        "function": {
-                            "x_function": "internal:linear",
-                            "y_function": "internal:bezier_2",
-                            "control_points": [
-                                {
-                                    "compute_type": "no_arg_function",
-                                    "action": "this"
-                                },
-                                [200, 100],
-                                {
-                                    "compute_type": "no_arg_function",
-                                    "action": "player"
-                                }
-                            ]
-                        }
-                    }
-                }
-                """;
-        Long2ObjectMap<BulletPath> map = PathControllingBullet.PATH_LIST_CODEC.parse(
-                new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(json))
-        ).getOrThrow(false, System.out::println);
-        System.out.println(map);
-    }
 }

@@ -16,6 +16,12 @@ public record ResourceLocation(String namespace, String path) {
         return new ResourceLocation(path.substring(0, index), path.substring(index + 1));
     }
 
+    public ResourceLocation normalize() {
+        if (namespace == null)
+            return new ResourceLocation(PackManager.getNamespaceDefaultSelect(path), path);
+        return this;
+    }
+
     public String toString() {
         return namespace == null ? path : namespace + ":" + path;
     }

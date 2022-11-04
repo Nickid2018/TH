@@ -71,10 +71,12 @@ public class Playground {
                         "type": "fixed_path",
                         "time": 100,
                         "function": {
-                            "x_function": "internal:bezier_2",
-                            "y_function": "internal:bezier_2",
+                            "x_function": "test:scripts/test.js",
+                            "y_function": "test:scripts/test.js",
                             "control_points": [
                                 [200, 100],
+                                [100, 200],
+                                [300, 400],
                                 {
                                     "compute_type": "no_arg_function",
                                     "action": "player"
@@ -95,7 +97,7 @@ public class Playground {
         player.tick(tickTime);
 
         if (tickTime % 160 > 80 * ((4000 - tickTime) / 4000.0)) {
-            for (int i = 0; i < 500; i++) {
+            for (int i = 0; i < 200; i++) {
                 PathControllingBullet bullet = new PathControllingBullet(this, bulletBasicData2, "green",
                         new Vector2f(random.nextInt(PLAYGROUND_WIDTH), -12), map);
                 addBullet(bullet);

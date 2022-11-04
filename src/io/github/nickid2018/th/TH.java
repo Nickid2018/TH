@@ -19,6 +19,7 @@ import io.github.nickid2018.th.gui.GameScreen;
 import io.github.nickid2018.th.pack.FileDataPack;
 import io.github.nickid2018.th.pack.InternalDataPack;
 import io.github.nickid2018.th.pack.PackManager;
+import io.github.nickid2018.th.system.script.ScriptRunner;
 import io.github.nickid2018.tiny2d.font.VectorFont;
 import io.github.nickid2018.tiny2d.sound.SoundEngine;
 import io.github.nickid2018.tiny2d.window.Window;
@@ -32,6 +33,7 @@ public class TH {
 
     public static void main(String[] args) throws IOException {
         PackManager.setPackList(List.of(new InternalDataPack(), new FileDataPack(new File("test"))));
+        ScriptRunner.init();
         VectorFont font = new VectorFont(new FileInputStream("C:\\Windows\\Fonts\\Arial.ttf"));
         Window window = new Window("TH - Temp Runner", 1200, 916, font, false);
         SoundEngine.initEngine(null);

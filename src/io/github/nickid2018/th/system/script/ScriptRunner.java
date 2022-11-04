@@ -1,9 +1,15 @@
 package io.github.nickid2018.th.system.script;
 
+import io.github.nickid2018.th.pack.PackManager;
+import io.github.nickid2018.th.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openjdk.nashorn.api.scripting.JSObject;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
+import org.openjdk.nashorn.internal.objects.Global;
+import org.openjdk.nashorn.internal.runtime.Context;
+import org.openjdk.nashorn.internal.runtime.ScriptFunction;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -11,30 +17,50 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class ScriptRunner {
 
     public static final Logger JS_LOGGER = LogManager.getLogger("Java Script Mod");
     private static ScriptEngine scriptEngine;
 
-    private static final Set<String> loadedScripts = new HashSet<>();
+    private static final Set<ResourceLocation> loadedScripts = new HashSet<>();
+
+
+    public static final Field SOBJ_FIELD;
+    public static final Field GLOBAL;
+    public static final ThreadLocal<Global> CURRENT_GLOBAL;
+    public static final Method INVOKE_METHOD;
+
+    static {
+        try {
+            SOBJ_FIELD = ScriptObjectMirror.class.getDeclaredField("sobj");
+            SOBJ_FIELD.setAccessible(true);
+            Field currentGlobal = Context.class.getDeclaredField("currentGlobal");
+            currentGlobal.setAccessible(true);
+            CURRENT_GLOBAL = (ThreadLocal<Global>) currentGlobal.get(null);
+            GLOBAL = ScriptObjectMirror.class.getDeclaredField("global");
+            GLOBAL.setAccessible(true);
+            INVOKE_METHOD = ScriptFunction.class.getDeclaredMethod("invoke", Object.class, Object[].class);
+            INVOKE_METHOD.setAccessible(true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void init() {
         scriptEngine = new ScriptEngineManager().getEngineByName("javascript");
 
-        // Load engine script
         try {
-            loadPackage(ScriptRunner.class.getResourceAsStream("/scripts/engine.js"), "<engine_internal>");
+            loadPackage(ResourceLocation.internal("scripts/engine.js"));
         } catch (ScriptException | IOException e) {
             JS_LOGGER.error("Failed to load engine script", e);
         }
-    }
-
-    public static boolean packageLoaded(String name) {
-        return loadedScripts.contains(name);
     }
 
     public static void evalString(String eval) throws ScriptException {
@@ -42,33 +68,34 @@ public class ScriptRunner {
         scriptEngine.eval(eval);
     }
 
-    public static void loadPackage(String name) throws ScriptException, IOException {
-        loadPackage(ScriptRunner.class.getResourceAsStream(name), name);
+    public static boolean packageLoaded(ResourceLocation location) {
+        return loadedScripts.contains(location);
     }
 
-    public static void loadPackage(String info, String name) throws ScriptException {
-        scriptEngine.getContext().setAttribute(ScriptEngine.FILENAME, name, ScriptContext.ENGINE_SCOPE);
+    public static void loadPackage(ResourceLocation location) throws ScriptException, IOException {
+        loadPackage(PackManager.createInputStream(location), location.normalize());
+    }
+
+    public static void loadPackage(String info, ResourceLocation location) throws ScriptException {
+        scriptEngine.getContext().setAttribute(ScriptEngine.FILENAME, location.toString(), ScriptContext.ENGINE_SCOPE);
         scriptEngine.eval(info);
-        loadedScripts.add(name);
+        loadedScripts.add(location);
     }
 
-    public static void loadPackage(InputStream source, String name) throws IOException, ScriptException {
-        String info = IOUtils.toString(source, StandardCharsets.UTF_8);
-        loadPackage(info, name);
+    public static void loadPackage(InputStream source, ResourceLocation name) throws IOException, ScriptException {
+        loadPackage(IOUtils.toString(source, StandardCharsets.UTF_8), name);
     }
 
     public static JSObject getJSObject(String name) {
         return (JSObject) scriptEngine.get(name);
     }
 
-    public static void main(String[] args) {
-        ScriptRunner.init();
+    public static Object runScriptNoInvalidate(ScriptObjectMirror object, ScriptFunction function, Object... args) {
         try {
-            ScriptRunner.evalString("""
-                    print(engine.packageLoaded);
-                    """);
+            CURRENT_GLOBAL.set((Global) GLOBAL.get(object));
+            return INVOKE_METHOD.invoke(function, null, args);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

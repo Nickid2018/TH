@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import io.github.nickid2018.th.util.CodecUtil;
 import lombok.Getter;
 
 import java.io.Closeable;
@@ -18,6 +19,9 @@ public abstract class DataPack implements Closeable {
 
     @Getter
     protected PackMetadata metadata;
+
+    @Getter
+    protected ScriptObjectData scriptObjectData;
 
     public DataPack(String namespace) {
         this.namespace = namespace;
@@ -41,7 +45,23 @@ public abstract class DataPack implements Closeable {
     protected void loadMetadata() throws IOException {
         JsonElement element = getJsonEntry("pack.metadata");
         metadata = PackMetadata.CODEC.parse(new Dynamic<>(JsonOps.INSTANCE, element))
-                .getOrThrow(false, error -> {});
+                .getOrThrow(false, CodecUtil.NOP);
+    }
+
+    public String getScriptVariableName(String path) {
+        if (scriptObjectData == null) {
+            try {
+                loadScriptObjectData();
+            } catch (IOException ignored) {
+            }
+        }
+        return scriptObjectData.scriptObjects().get(path);
+    }
+
+    private void loadScriptObjectData() throws IOException {
+        JsonElement element = getJsonEntry("script.list");
+        scriptObjectData = ScriptObjectData.CODEC.parse(new Dynamic<>(JsonOps.INSTANCE, element))
+                .getOrThrow(false, CodecUtil.NOP);
     }
 
     @Override
