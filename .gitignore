@@ -6,3 +6,4 @@ logs/
 .gradle/
 build/
 test/
+out/
