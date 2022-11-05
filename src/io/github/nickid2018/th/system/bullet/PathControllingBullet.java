@@ -14,6 +14,8 @@ import java.util.List;
 
 public class PathControllingBullet extends Bullet {
 
+    public static final Vector2f POSITIVE_X = new Vector2f(1, 0);
+
     public static final Codec<Long2ObjectMap<BulletPath>> PATH_LIST_CODEC = Codec.compoundList(
             Codec.STRING, BulletPath.CODEC
     ).xmap(
@@ -51,7 +53,11 @@ public class PathControllingBullet extends Bullet {
             storedArgs = currentPath.createArguments(this);
             lastTick = lifeTime;
         }
+        Vector2f lastPos = sphere.getPosition();
         currentPath.tick(lifeTime - lastTick, this);
+        Vector2f newPos = sphere.getPosition();
+        Vector2f dir = newPos.sub(lastPos);
+        angle = dir.angle(POSITIVE_X);
         super.tick(tickTime);
     }
 }

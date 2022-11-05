@@ -1,5 +1,7 @@
 package io.github.nickid2018.th.gui;
 
+import io.github.nickid2018.th.crash.CrashReport;
+import io.github.nickid2018.th.crash.DetectedCrashError;
 import io.github.nickid2018.tiny2d.shader.ShaderProgram;
 import io.github.nickid2018.tiny2d.shader.ShaderSource;
 import io.github.nickid2018.tiny2d.shader.ShaderType;
@@ -21,7 +23,7 @@ public class Shaders {
             program.addUniform("transform");
             program.addUniform("color");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            makeCrashReportAndThrow(e, "tex_color");
         }
         return program;
     });
@@ -39,8 +41,13 @@ public class Shaders {
                 INSTANCED_UNIFORMS.add(program.addUniform("transform[" + i + "]"));
             INSTANCED_COLOR = program.addUniform("color");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            makeCrashReportAndThrow(e, "tex_color_instanced");
         }
         return program;
     });
+
+    private static void makeCrashReportAndThrow(Exception e, String key) throws Error {
+        CrashReport report = new CrashReport("Failed to load shader " + key, e);
+        throw new DetectedCrashError(report);
+    }
 }

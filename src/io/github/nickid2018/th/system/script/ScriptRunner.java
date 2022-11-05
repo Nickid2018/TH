@@ -6,14 +6,14 @@ import io.github.nickid2018.th.crash.DetectedCrashError;
 import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openjdk.nashorn.api.scripting.JSObject;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.openjdk.nashorn.internal.objects.Global;
 import org.openjdk.nashorn.internal.runtime.Context;
 import org.openjdk.nashorn.internal.runtime.ECMAException;
 import org.openjdk.nashorn.internal.runtime.ScriptFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -33,7 +33,7 @@ import java.util.Set;
 @SuppressWarnings("unchecked")
 public class ScriptRunner {
 
-    public static final Logger JS_LOGGER = LogManager.getLogger("Java Script Mod");
+    public static final Logger JS_LOGGER = LoggerFactory.getLogger("Java Script Mod");
     private static ScriptEngine scriptEngine;
 
     private static final Set<ResourceLocation> loadedScripts = new HashSet<>();

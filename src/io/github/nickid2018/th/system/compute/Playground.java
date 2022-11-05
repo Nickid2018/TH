@@ -1,25 +1,21 @@
 package io.github.nickid2018.th.system.compute;
 
-import com.google.gson.JsonParser;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
 import io.github.nickid2018.th.gui.PlayGroundGui;
 import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.phys.Sphere;
 import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.bullet.BulletBasicData;
 import io.github.nickid2018.th.system.bullet.BulletDispenser;
-import io.github.nickid2018.th.system.bullet.PathControllingBullet;
-import io.github.nickid2018.th.system.bullet.path.BulletPath;
+import io.github.nickid2018.th.system.dyn.UserDefinedBulletMaker;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.player.Player;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.math.AABB;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.joml.Vector2f;
 
+import java.lang.invoke.MethodHandle;
 import java.util.*;
 
 // 384x448
@@ -55,7 +51,8 @@ public class Playground {
     protected Random random = new Random();
 
     BulletBasicData bulletBasicData, bulletBasicData2;
-    Long2ObjectMap<BulletPath> map;
+
+    MethodHandle bulletMaker;
 
     public Playground() {
         playgroundBulletAABB = AABB.newAABB(-20, -20, PLAYGROUND_WIDTH + 20, PLAYGROUND_HEIGHT + 20);
@@ -65,31 +62,9 @@ public class Playground {
         bulletBasicData2 = PackManager.createObject(
                 ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
 
-        String json = """
-                {
-                    "0": {
-                        "type": "fixed_path",
-                        "time": 100,
-                        "function": {
-                            "x_function": "internal:linear",
-                            "y_function": "internal:linear",
-                            "control_points": [
-                                {
-                                    "compute_type": "function",
-                                    "function": "test:scripts/test.json",
-                                    "arguments": [
-                                        [100, 200],
-                                        [0, 0]
-                                    ]
-                                }
-                            ]
-                        }
-                    }
-                }
-                """;
-        map = PathControllingBullet.PATH_LIST_CODEC.parse(
-                new Dynamic<>(JsonOps.INSTANCE, JsonParser.parseString(json))
-        ).getOrThrow(false, System.out::println);
+        UserDefinedBulletMaker maker = PackManager.createObject(
+                ResourceLocation.fromString("test:paths/test.json"), UserDefinedBulletMaker.CODEC);
+        bulletMaker = maker.getConstructor();
     }
 
     public void update() {
@@ -99,12 +74,17 @@ public class Playground {
 
         if (tickTime % 160 > 80 * ((4000 - tickTime) / 4000.0)) {
             for (int i = 0; i < 200; i++) {
-                PathControllingBullet bullet = new PathControllingBullet(this, bulletBasicData2, "green",
-                        new Vector2f(random.nextInt(PLAYGROUND_WIDTH), -12), map);
-                addBullet(bullet);
+                try {
+                    Bullet bullet = (Bullet) bulletMaker.invoke(this, bulletBasicData, "green",
+                            new Vector2f(random.nextInt(PLAYGROUND_WIDTH), -12));
+                    addBullet(bullet);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
 
+        System.out.println(bullets.size());
         bullets.forEach(b -> b.tick(tickTime));
         enemies.forEach(e -> e.tick(tickTime));
         bulletDispensers.forEach(d -> d.tick(tickTime));
