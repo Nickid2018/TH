@@ -19,34 +19,44 @@ public class UserDefinedAxisPositionFunction implements AxisPositionFunction {
 
     public UserDefinedAxisPositionFunction(ResourceLocation location) {
         this.location = location;
-        ScriptObjectMirror tmp;
+        ScriptObjectMirror mirror;
+        ScriptFunction scriptFunction;
         try {
             if (!ScriptRunner.packageLoaded(location))
                 ScriptRunner.loadPackage(location);
             String name = Objects.requireNonNull(
                     PackManager.getPack(PackManager.getNamespaceDefaultSelect(location.path()))
             ).getScriptVariableName(location.path());
-            tmp = (ScriptObjectMirror) ScriptRunner.getJSObject(name).getMember("axisCompute");
+            mirror = (ScriptObjectMirror) ScriptRunner.getJSObject(name).getMember("axisCompute");
         } catch (Exception e) {
             ScriptRunner.JS_LOGGER.error("Failed to load script " + location, e);
-            tmp = null;
+            mirror = null;
         }
-        object = tmp;
-        try {
-            function = (ScriptFunction) ScriptRunner.SOBJ_FIELD.get(tmp);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        object = mirror;
+        if (object != null)
+            try {
+                scriptFunction = (ScriptFunction) ScriptRunner.SOBJ_FIELD.get(mirror);
+            } catch (Exception e) {
+                ScriptRunner.JS_LOGGER.error("Failed to load script " + location, e);
+                scriptFunction = null;
+            }
+        else
+            scriptFunction = null;
+        function = scriptFunction;
     }
 
 
     @Override
     public float getValue(float t, IntToFloatFunction arguments) {
         try {
-
+            if (object == null)
+                return 0;
+            if (function == null)
+                return 0;
             return ((Number) ScriptRunner.runScriptNoInvalidate(object, function, t, arguments)).floatValue();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            ScriptRunner.JS_LOGGER.error("Failed to run Axis Position script " + location, e);
+            return 0;
         }
     }
 }

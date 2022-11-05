@@ -2,7 +2,7 @@ package io.github.nickid2018.th.crash;
 
 import java.io.Serial;
 
-public class DetectedCrashException extends RuntimeException {
+public class DetectedCrashError extends Error {
 
     /**
      *
@@ -12,7 +12,7 @@ public class DetectedCrashException extends RuntimeException {
 
     private final CrashReport report;
 
-    public DetectedCrashException(CrashReport report) {
+    public DetectedCrashError(CrashReport report) {
         this.report = report;
     }
 

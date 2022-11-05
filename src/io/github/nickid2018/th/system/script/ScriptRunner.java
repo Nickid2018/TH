@@ -1,5 +1,8 @@
 package io.github.nickid2018.th.system.script;
 
+import io.github.nickid2018.th.crash.CrashReport;
+import io.github.nickid2018.th.crash.CrashReportSession;
+import io.github.nickid2018.th.crash.DetectedCrashError;
 import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
@@ -9,6 +12,7 @@ import org.openjdk.nashorn.api.scripting.JSObject;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.openjdk.nashorn.internal.objects.Global;
 import org.openjdk.nashorn.internal.runtime.Context;
+import org.openjdk.nashorn.internal.runtime.ECMAException;
 import org.openjdk.nashorn.internal.runtime.ScriptFunction;
 
 import javax.script.ScriptContext;
@@ -18,8 +22,10 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,9 +39,9 @@ public class ScriptRunner {
 
 
     public static final Field SOBJ_FIELD;
-    public static final Field GLOBAL;
-    public static final ThreadLocal<Global> CURRENT_GLOBAL;
-    public static final Method INVOKE_METHOD;
+    private static final Field GLOBAL;
+    private static final ThreadLocal<Global> CURRENT_GLOBAL;
+    private static final Method INVOKE_METHOD;
 
     static {
         try {
@@ -90,12 +96,25 @@ public class ScriptRunner {
         return (JSObject) scriptEngine.get(name);
     }
 
-    public static Object runScriptNoInvalidate(ScriptObjectMirror object, ScriptFunction function, Object... args) {
+    public static Object runScriptNoInvalidate(ScriptObjectMirror object,
+                                               ScriptFunction function,
+                                               Object... args) throws Exception {
         try {
             CURRENT_GLOBAL.set((Global) GLOBAL.get(object));
             return INVOKE_METHOD.invoke(function, null, args);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            Throwable target = e.getTargetException();
+            if (target instanceof ECMAException || target instanceof Error) {
+                CrashReport report = new CrashReport("Script Error", target);
+                CrashReportSession session = new CrashReportSession("Script Engine");
+                session.addDetailObject("Script Engine", scriptEngine);
+                session.addDetailObject("Script Object", object.getClassName());
+                session.addDetailObject("Script Function", function);
+                session.addDetailObject("Script Arguments", Arrays.toString(args));
+                report.addSession(session);
+                throw new DetectedCrashError(report);
+            } else
+                throw (Exception) target;
         }
     }
 }

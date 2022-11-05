@@ -48,5 +48,9 @@ public class AxisPositionFunctions {
         registerValueFunction(ResourceLocation.fromString("internal:inv_quartic"), AxisPositionFunction.INV_QUARTIC);
         registerValueFunction(ResourceLocation.fromString("internal:bezier_2"), AxisPositionFunction.BEZIER_2);
         registerValueFunction(ResourceLocation.fromString("internal:bezier_3"), AxisPositionFunction.BEZIER_3);
+        registerValueFunction(ResourceLocation.fromString("internal:polynomial"), AxisPositionFunction.POLYNOMIAL);
+        registerValueFunction(ResourceLocation.fromString("internal:polynomial_lerp"), AxisPositionFunction.POLYNOMIAL_LERP);
+        registerValueFunction(ResourceLocation.fromString("internal:sin"), AxisPositionFunction.SIN);
+        registerValueFunction(ResourceLocation.fromString("internal:cos"), AxisPositionFunction.COS);
     }
 }

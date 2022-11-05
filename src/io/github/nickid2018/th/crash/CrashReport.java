@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CrashReport {
@@ -79,7 +78,7 @@ public class CrashReport {
     public void writeToFile() {
         try {
             File file = new File("crash-report/crash-"
-                    + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + ".txt");
+                    + new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss").format(new Date()) + ".txt");
             File dir = file.getParentFile();
             if (!dir.isDirectory())
                 dir.mkdirs();
@@ -125,7 +124,7 @@ public class CrashReport {
         system.addDetailObject("CPU Count", Runtime.getRuntime().availableProcessors());
         system.addDetailSupplier("VM Arguments", () -> {
             StringBuilder sb = new StringBuilder();
-            List<String> vmArgs = getVmArguments().collect(Collectors.toList());
+            List<String> vmArgs = getVmArguments().toList();
             sb.append("Total count ");
             sb.append(vmArgs.size());
             sb.append(";");
@@ -134,7 +133,7 @@ public class CrashReport {
         });
         system.addDetailSupplier("User Arguments", () -> {
             StringBuilder sb = new StringBuilder();
-            List<String> userArgs = getUserArguments().collect(Collectors.toList());
+            List<String> userArgs = getUserArguments().toList();
             sb.append("Total count ");
             sb.append(userArgs.size());
             sb.append(";");

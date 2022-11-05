@@ -43,13 +43,13 @@ dependencies {
     implementation 'it.unimi.dsi:fastutil:8.5.9'
     implementation 'org.apache.commons:commons-collections4:4.4'
 
-    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.19.0'
-
     implementation 'org.openjdk.nashorn:nashorn-core:15.4'
     implementation 'com.github.oshi:oshi-core:6.3.0'
     implementation 'com.mojang:datafixerupper:5.0.28'
+
+    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.19.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
