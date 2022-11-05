@@ -63,6 +63,8 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
     private final float spriteScaleX;
     private final float spriteScaleY;
 
+    private final List<Matrix4f> matrices = new ArrayList<>();
+
     public PlayGroundGui(Window window, int x, int y, int width, int height, Playground playground, int guiScale) {
         super(window, x, y, width, height);
         this.playground = playground;
@@ -70,6 +72,8 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         buffer = new FrameBuffer(Playground.PLAYGROUND_WIDTH * guiScale, Playground.PLAYGROUND_HEIGHT * guiScale);
         spriteScaleX = PlayGroundGui.SPRITE_SIZE / (float) Playground.PLAYGROUND_WIDTH * 2 * guiScale;
         spriteScaleY = PlayGroundGui.SPRITE_SIZE / (float) Playground.PLAYGROUND_HEIGHT * 2 * guiScale;
+        for (int i = 0; i < 100; i++)
+            matrices.add(new Matrix4f());
 
         soundInstanceMissed = new Sound(SoundRepository.createSoundDefinition(
                 ResourceLocation.fromString("sounds/effect/se_pldead00.json")));
@@ -89,6 +93,15 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         matrix.translate(x, y, 0);
         matrix.scale(spriteScaleX, spriteScaleY, 1);
         return matrix;
+    }
+
+    private void getHittableItemMatrixInBuffer(HittableItem item, int writeTo) {
+        Matrix4f matrix = matrices.get(writeTo);
+        matrix.identity();
+        float y = item.getHitSphere().y / Playground.PLAYGROUND_HEIGHT * 2 - 1;
+        float x = item.getHitSphere().x / Playground.PLAYGROUND_WIDTH * 2 - 1;
+        matrix.translate(x, y, 0);
+        matrix.scale(spriteScaleX, spriteScaleY, 1);
     }
 
     @Override
@@ -140,26 +153,16 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         GL11.glDisable(GL11.GL_BLEND);
     }
 
-    private void drawInstanced(ShaderProgram program, Bullet bullet, List<Matrix4f> matrix4fs) {
+    private void drawInstanced(Bullet bullet, int toDraw) {
         if (bullet.getBulletBasicData().isHasTint())
-            program.getUniform("color").set3fv(bullet.getColor());
+            Shaders.INSTANCED_COLOR.set3fv(bullet.getColor());
         else
-            program.getUniform("color").set3fv(1, 1, 1);
+            Shaders.INSTANCED_COLOR.set3fv(1, 1, 1);
 
-        while (matrix4fs.size() > 100) {
-            List<Matrix4f> sub = matrix4fs.subList(0, 100);
-            for (int i = 0; i < 100; i++)
-                program.getUniform("transform[" + i + "]").setMatrix4f(sub.get(i));
-            bullet.getBulletBasicData().getTexture(bullet.getVariant()).bind();
-            bullet.getBulletBasicData().getVertexArray(bullet.getVariant()).drawInstanced(100);
-            sub.clear();
-        }
-
-        for (int i = 0; i < matrix4fs.size(); i++)
-            program.getUniform("transform[" + i + "]").setMatrix4f(matrix4fs.get(i));
+        for (int i = 0; i < toDraw; i++)
+            Shaders.INSTANCED_UNIFORMS.get(i).setMatrix4f(matrices.get(i));
         bullet.getBulletBasicData().getTexture(bullet.getVariant()).bind();
-        bullet.getBulletBasicData().getVertexArray(bullet.getVariant()).drawInstanced(matrix4fs.size());
-        matrix4fs.clear();
+        bullet.getBulletBasicData().getVertexArray(bullet.getVariant()).drawInstanced(toDraw);
     }
 
     private void renderBullets(GuiRenderContext context) {
@@ -167,8 +170,8 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         ShaderProgram program = Shaders.TEX_COLOR_INSTANCED.get();
         program.use();
-        List<Matrix4f> matrices = new ArrayList<>();
         Bullet[] lastBullet = {null};
+        int[] toDraw = {0};
         playground.getBullets().stream().sorted((b1, b2) -> {
             int i = b1.getBulletBasicData().compareTo(b2.getBulletBasicData());
             if (i == 0)
@@ -178,16 +181,20 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
             if (lastBullet[0] == null)
                 lastBullet[0] = bullet;
             else if (!lastBullet[0].similar(bullet)) {
-                drawInstanced(program, lastBullet[0], matrices);
+                drawInstanced(lastBullet[0], toDraw[0]);
                 lastBullet[0] = bullet;
+                toDraw[0] = 0;
+            } else if (toDraw[0] == 100) {
+                drawInstanced(lastBullet[0], 100);
+                toDraw[0] = 0;
             }
-            Matrix4f matrix = getHittableItemMatrix(bullet);
+            getHittableItemMatrixInBuffer(bullet, toDraw[0]);
             if (bullet.getBulletBasicData().isHasRenderAngle())
-                matrix.rotate(bullet.getAngle(), 0, 0, 1);
-            matrices.add(matrix);
+                matrices.get(toDraw[0]).rotate(bullet.getAngle(), 0, 0, 1);
+            toDraw[0]++;
         });
         if (lastBullet[0] != null)
-            drawInstanced(program, lastBullet[0], matrices);
+            drawInstanced(lastBullet[0], toDraw[0]);
 
         GL11.glDisable(GL11.GL_BLEND);
     }

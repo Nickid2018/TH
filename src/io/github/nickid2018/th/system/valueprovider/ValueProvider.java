@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.valueprovider.floating.ConstantFloat;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
+import io.github.nickid2018.th.system.valueprovider.function.ValueFunction;
 import io.github.nickid2018.th.system.valueprovider.integer.ConstantInt;
 import io.github.nickid2018.th.system.valueprovider.integer.IntProvider;
 import io.github.nickid2018.th.system.valueprovider.vector.ConstantVector2f;
@@ -36,6 +37,26 @@ public interface ValueProvider<T> {
             case "float" -> FloatProvider.CODEC;
             case "vec2" -> Vector2fProvider.DISPATCH_CODEC;
             default -> throw new IllegalArgumentException("Unknown type: " + s);
+        };
+    }
+
+    @SuppressWarnings("rawtypes")
+    static Class nameToClass(String s) {
+        return switch (s) {
+            case "int" -> IntProvider.class;
+            case "float" -> FloatProvider.class;
+            case "vec2" -> Vector2fProvider.class;
+            default -> throw new IllegalArgumentException("Unknown type: " + s);
+        };
+    }
+
+    @SuppressWarnings("rawtypes")
+    static String classToName(Class aClass) {
+        return switch (aClass.getSimpleName()) {
+            case "IntProvider" -> "int";
+            case "FloatProvider" -> "float";
+            case "Vector2fProvider" -> "vec2";
+            default -> throw new IllegalArgumentException("Unknown type: " + aClass.getSimpleName());
         };
     }
 

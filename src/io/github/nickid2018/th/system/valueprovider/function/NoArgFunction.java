@@ -1,9 +1,10 @@
-package io.github.nickid2018.th.system.valueprovider;
+package io.github.nickid2018.th.system.valueprovider.function;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.system.compute.HittableItem;
+import io.github.nickid2018.th.system.valueprovider.ValueProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

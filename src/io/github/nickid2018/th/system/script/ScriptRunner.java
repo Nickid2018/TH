@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @SuppressWarnings("unchecked")
@@ -64,6 +65,7 @@ public class ScriptRunner {
 
         try {
             loadPackage(ResourceLocation.internal("scripts/engine.js"));
+            loadPackage(ResourceLocation.internal("scripts/primitive_types.js"));
         } catch (ScriptException | IOException e) {
             JS_LOGGER.error("Failed to load engine script", e);
         }
@@ -74,8 +76,8 @@ public class ScriptRunner {
         scriptEngine.eval(eval);
     }
 
-    public static boolean packageLoaded(ResourceLocation location) {
-        return loadedScripts.contains(location);
+    public static boolean packageNotLoaded(ResourceLocation location) {
+        return !loadedScripts.contains(location);
     }
 
     public static void loadPackage(ResourceLocation location) throws ScriptException, IOException {
@@ -94,6 +96,29 @@ public class ScriptRunner {
 
     public static JSObject getJSObject(String name) {
         return (JSObject) scriptEngine.get(name);
+    }
+
+    public static ScriptObjectMirror loadAndCreateObjectMirror(ResourceLocation location, String name) {
+        try {
+            if (packageNotLoaded(location))
+                loadPackage(location);
+            String objectName = Objects.requireNonNull(
+                    PackManager.getPack(location.namespace())).getScriptVariableName(location.path());
+            return (ScriptObjectMirror) getJSObject(objectName).getMember(name);
+        } catch (Exception e) {
+            JS_LOGGER.error("Failed to load script " + location, e);
+            return null;
+        }
+    }
+
+    public static ScriptFunction getScriptFunction(ResourceLocation location, ScriptObjectMirror mirror) {
+        if (mirror != null)
+            try {
+                return (ScriptFunction) SOBJ_FIELD.get(mirror);
+            } catch (Exception e) {
+                JS_LOGGER.error("Failed to load script " + location, e);
+            }
+        return null;
     }
 
     public static Object runScriptNoInvalidate(ScriptObjectMirror object,

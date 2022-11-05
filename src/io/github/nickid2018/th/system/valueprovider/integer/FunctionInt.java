@@ -1,7 +1,7 @@
 package io.github.nickid2018.th.system.valueprovider.integer;
 
 import com.mojang.serialization.Codec;
-import io.github.nickid2018.th.system.valueprovider.ValueFunction;
+import io.github.nickid2018.th.system.valueprovider.function.ValueFunction;
 import io.github.nickid2018.th.system.valueprovider.ValueProvider;
 import io.github.nickid2018.th.system.valueprovider.WithArgsFunctionProvider;
 

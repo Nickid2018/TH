@@ -71,15 +71,16 @@ public class Playground {
                         "type": "fixed_path",
                         "time": 100,
                         "function": {
-                            "x_function": "test:scripts/test.js",
-                            "y_function": "test:scripts/test.js",
+                            "x_function": "internal:linear",
+                            "y_function": "internal:linear",
                             "control_points": [
-                                [200, 100],
-                                [100, 200],
-                                [300, 400],
                                 {
-                                    "compute_type": "no_arg_function",
-                                    "action": "player"
+                                    "compute_type": "function",
+                                    "function": "test:scripts/test.json",
+                                    "arguments": [
+                                        [100, 200],
+                                        [0, 0]
+                                    ]
                                 }
                             ]
                         }

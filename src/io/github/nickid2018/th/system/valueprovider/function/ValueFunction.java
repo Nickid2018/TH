@@ -1,6 +1,7 @@
-package io.github.nickid2018.th.system.valueprovider;
+package io.github.nickid2018.th.system.valueprovider.function;
 
 import io.github.nickid2018.th.system.compute.HittableItem;
+import io.github.nickid2018.th.system.valueprovider.ValueProvider;
 import lombok.Getter;
 
 import java.util.List;
@@ -8,8 +9,9 @@ import java.util.List;
 public abstract class ValueFunction<T> {
 
     @Getter
-    private final String name;
-    private final Class<? extends ValueProvider<?>>[] arguments;
+    protected final String name;
+    @Getter
+    protected final Class<? extends ValueProvider<?>>[] arguments;
 
     @SafeVarargs
     public ValueFunction(String name, Class<? extends ValueProvider<?>>... arguments) {

@@ -2,7 +2,7 @@ package io.github.nickid2018.th.system.valueprovider.vector;
 
 import com.mojang.serialization.Codec;
 import io.github.nickid2018.th.system.compute.HittableItem;
-import io.github.nickid2018.th.system.valueprovider.ValueFunction;
+import io.github.nickid2018.th.system.valueprovider.function.ValueFunction;
 import io.github.nickid2018.th.system.valueprovider.ValueProvider;
 import io.github.nickid2018.th.system.valueprovider.WithArgsFunctionProvider;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
