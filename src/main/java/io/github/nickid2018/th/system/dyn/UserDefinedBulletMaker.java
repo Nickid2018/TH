@@ -16,6 +16,11 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+//#if DEBUG
+//$import java.io.FileOutputStream;
+//$import java.io.File;
+//#endif
+
 import static org.objectweb.asm.Opcodes.*;
 
 public class UserDefinedBulletMaker {

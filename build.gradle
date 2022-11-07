@@ -24,17 +24,6 @@ repositories {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src']
-        }
-        resources {
-            srcDirs = ['resources']
-        }
-    }
-}
-
 dependencies {
     implementation "org.lwjgl:lwjgl:${lwjglVersion}"
     implementation "org.lwjgl:lwjgl-opengl:${lwjglVersion}"
@@ -95,10 +84,9 @@ preprocess {
     configFiles = ['jcpconfig.txt']
 }
 
-// Use Preprocess task to preprocess source files when comment off
-//task(changeSourceFolder) {
-//    sourceSets.main.java.srcDirs = [preprocess.target]
-//}.dependsOn preprocess
+task(changeSourceFolder) {
+    sourceSets.main.java.srcDirs = [preprocess.target]
+}.dependsOn preprocess
 
 compileJava.dependsOn preprocess
 
