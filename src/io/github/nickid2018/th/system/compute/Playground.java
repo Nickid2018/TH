@@ -6,16 +6,13 @@ import io.github.nickid2018.th.phys.Sphere;
 import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.bullet.BulletBasicData;
 import io.github.nickid2018.th.system.bullet.BulletDispenser;
-import io.github.nickid2018.th.system.dyn.UserDefinedBulletMaker;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.player.Player;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.math.AABB;
 import lombok.Getter;
 import lombok.Setter;
-import org.joml.Vector2f;
 
-import java.lang.invoke.MethodHandle;
 import java.util.*;
 
 // 384x448
@@ -52,8 +49,6 @@ public class Playground {
 
     BulletBasicData bulletBasicData, bulletBasicData2;
 
-    MethodHandle bulletMaker;
-
     public Playground() {
         playgroundBulletAABB = AABB.newAABB(-20, -20, PLAYGROUND_WIDTH + 20, PLAYGROUND_HEIGHT + 20);
 
@@ -61,10 +56,6 @@ public class Playground {
                 ResourceLocation.fromString("bullets/ball.json"), BulletBasicData.CODEC);
         bulletBasicData2 = PackManager.createObject(
                 ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
-
-        UserDefinedBulletMaker maker = PackManager.createObject(
-                ResourceLocation.fromString("test:paths/test.json"), UserDefinedBulletMaker.CODEC);
-        bulletMaker = maker.getConstructor();
     }
 
     public void update() {
@@ -72,19 +63,6 @@ public class Playground {
 
         player.tick(tickTime);
 
-        if (tickTime % 160 > 80 * ((4000 - tickTime) / 4000.0)) {
-            for (int i = 0; i < 200; i++) {
-                try {
-                    Bullet bullet = (Bullet) bulletMaker.invoke(this, bulletBasicData, "green",
-                            new Vector2f(random.nextInt(PLAYGROUND_WIDTH), -12));
-                    addBullet(bullet);
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        System.out.println(bullets.size());
         bullets.forEach(b -> b.tick(tickTime));
         enemies.forEach(e -> e.tick(tickTime));
         bulletDispensers.forEach(d -> d.tick(tickTime));

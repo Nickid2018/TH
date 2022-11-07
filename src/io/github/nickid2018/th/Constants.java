@@ -18,5 +18,4 @@ package io.github.nickid2018.th;
 public class Constants {
 
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
 }

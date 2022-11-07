@@ -5,7 +5,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.util.ResourceLocation;
 import lombok.Getter;
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -57,7 +60,7 @@ public class UserDefinedBulletMaker {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
         cw.visit(V17, ACC_PUBLIC + ACC_SUPER + ACC_FINAL,
                 className, null, SUPER_CLASS, null);
-        cw.visitSource(location.toString(), null);
+        cw.visitSource("UserDefinedBullet[" + location.toString() + "]", "Dynamic Generated");
         makeFields(cw);
         makeConstructor(cw);
         makeTick(cw);
@@ -65,6 +68,17 @@ public class UserDefinedBulletMaker {
         cw.visitEnd();
 
         byte[] bytes = cw.toByteArray();
+
+        //#if DEBUG
+        //$File file = new File("debug/" + className + ".class");
+        //$file.getParentFile().mkdirs();
+        //$try (FileOutputStream fos = new FileOutputStream(file)){
+        //$    fos.write(bytes);
+        //$} catch (Exception e) {
+        //$    e.printStackTrace();
+        //$}
+        //#endif
+
         clazz = CodeUploader.INSTANCE.defineClass(className.replace('/', '.'), bytes);
         Constructor<?> ctor = clazz.getConstructors()[0];
         try {

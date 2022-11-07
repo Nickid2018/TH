@@ -1,6 +1,17 @@
+buildscript {
+    repositories {
+        flatDir dirs: "../../jcp/target"
+    }
+    dependencies {
+        classpath "com.igormaznitsa:jcp:7.0.5"
+    }
+}
+
 plugins {
     id 'java'
 }
+
+apply plugin: 'com.igormaznitsa.jcp'
 
 group 'io.github.nickid2018'
 version '1.0-SNAPSHOT'
@@ -43,9 +54,9 @@ dependencies {
     implementation 'it.unimi.dsi:fastutil:8.5.9'
     implementation 'org.apache.commons:commons-collections4:4.4'
 
-    implementation 'org.ow2.asm:asm:9.3'
+    implementation 'org.ow2.asm:asm:9.4'
     implementation 'org.openjdk.nashorn:nashorn-core:15.4'
-    implementation 'com.github.oshi:oshi-core:6.3.0'
+    implementation 'com.github.oshi:oshi-core:6.3.1'
     implementation 'com.mojang:datafixerupper:5.0.28'
 
     implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
@@ -60,6 +71,36 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 }
+
+preprocess {
+    sources = sourceSets.main.java.srcDirs
+    allowWhitespaces = true
+    eol = '\r\n'
+    keepAttributes = true
+    sourceEncoding = 'UTF-8'
+    targetEncoding = 'UTF-8'
+    ignoreMissingSources = false
+    excludeExtensions = ['txt', 'xml']
+    fileExtensions = ['java']
+    unknownVarAsFalse = false
+    dryRun = false
+    verbose = true
+    clearTarget = true
+    careForLastEol = true
+    keepComments = true
+    keepLines = true
+    allowWhitespaces = true
+    preserveIndents = true
+    dontOverwriteSameContent = false
+    configFiles = ['jcpconfig.txt']
+}
+
+// Use Preprocess task to preprocess source files when comment off
+//task(changeSourceFolder) {
+//    sourceSets.main.java.srcDirs = [preprocess.target]
+//}.dependsOn preprocess
+
+compileJava.dependsOn preprocess
 
 test {
     useJUnitPlatform()
