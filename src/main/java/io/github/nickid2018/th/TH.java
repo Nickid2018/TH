@@ -38,8 +38,8 @@ public class TH {
     public static final Logger LOGGER = LoggerFactory.getLogger("TH System");
 
     public static void main(String[] args) throws IOException {
-        //#if DEBUG==true
-        //$LOGGER.info("Debug mode is enabled.");
+        //#if !NO_DEBUG
+        LOGGER.info("Debug mode is enabled.");
         //#endif
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
             if (e instanceof DetectedCrashError crashError) {

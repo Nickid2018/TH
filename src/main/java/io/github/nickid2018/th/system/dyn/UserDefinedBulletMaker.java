@@ -10,16 +10,13 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-//#if DEBUG
-//$import java.io.FileOutputStream;
-//$import java.io.File;
-//#endif
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -74,14 +71,14 @@ public class UserDefinedBulletMaker {
 
         byte[] bytes = cw.toByteArray();
 
-        //#if DEBUG
-        //$File file = new File("debug/" + className + ".class");
-        //$file.getParentFile().mkdirs();
-        //$try (FileOutputStream fos = new FileOutputStream(file)){
-        //$    fos.write(bytes);
-        //$} catch (Exception e) {
-        //$    e.printStackTrace();
-        //$}
+        //#if !NO_DEBUG
+        File file = new File("debug/" + className + ".class");
+        file.getParentFile().mkdirs();
+        try (FileOutputStream fos = new FileOutputStream(file)){
+            fos.write(bytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //#endif
 
         clazz = CodeUploader.INSTANCE.defineClass(className.replace('/', '.'), bytes);

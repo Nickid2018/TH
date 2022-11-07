@@ -11,13 +11,11 @@ plugins {
     id 'java'
 }
 
-apply plugin: 'application'
 apply plugin: 'com.igormaznitsa.jcp'
 
 group 'io.github.nickid2018'
 version '1.0-SNAPSHOT'
 project.ext.lwjglVersion = '3.3.1'
-mainClassName = 'io.github.nickid2018.th.TH'
 
 repositories {
     mavenLocal()
@@ -86,6 +84,7 @@ preprocess {
     dontOverwriteSameContent = false
     configFiles = ['jcpconfig.txt']
 }
+
 task(changeSourceFolder) {
     if (project.gradle.startParameter.taskNames.size() > 0)
         sourceSets.main.java.srcDirs = [preprocess.target]
