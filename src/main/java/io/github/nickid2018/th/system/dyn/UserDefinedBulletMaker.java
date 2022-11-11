@@ -92,11 +92,14 @@ public class UserDefinedBulletMaker {
     }
 
     private void makeFields(ClassWriter cw) {
-        FieldVisitor visitor = cw.visitField(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, CodeUploader.FIELD_SCRIPT_FUNCTION,
+        FieldVisitor visitor = cw.visitField(ACC_PRIVATE + ACC_STATIC + ACC_FINAL, CodeUploader.FIELD_SCRIPT_FUNCTION,
                 CodeUploader.FIELD_TYPE_SCRIPT_FUNCTION, null, null);
         visitor.visitEnd();
-        visitor = cw.visitField(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, CodeUploader.FIELD_SCRIPT_OBJECT,
+        visitor = cw.visitField(ACC_PRIVATE + ACC_STATIC + ACC_FINAL, CodeUploader.FIELD_SCRIPT_OBJECT,
                 CodeUploader.FIELD_TYPE_SCRIPT_OBJECT, null, null);
+        visitor.visitEnd();
+        visitor = cw.visitField(ACC_PRIVATE + ACC_STATIC + ACC_FINAL, CodeUploader.FIELD_CACHED_OBJECT_ARRAY,
+                CodeUploader.FIELD_TYPE_CACHED_OBJECT_ARRAY, null, null);
         visitor.visitEnd();
         for (Pair<String, String> field : fields) {
             visitor = cw.visitField(ACC_PUBLIC, field.getFirst(), field.getSecond(), null, null);
@@ -141,6 +144,10 @@ public class UserDefinedBulletMaker {
         mv.visitMethodInsn(INVOKESTATIC, CodeUploader.SCRIPT_RUNNER,
                 CodeUploader.SCRIPT_RUNNER_CREATE_FUNCTION, CodeUploader.SCRIPT_RUNNER_CREATE_FUNCTION_DESC, false);
         mv.visitFieldInsn(PUTSTATIC, className, CodeUploader.FIELD_SCRIPT_FUNCTION, CodeUploader.FIELD_TYPE_SCRIPT_FUNCTION);
+        // cachedObjectArray = new Object[2]
+        mv.visitInsn(ICONST_2);
+        mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+        mv.visitFieldInsn(PUTSTATIC, className, CodeUploader.FIELD_CACHED_OBJECT_ARRAY, CodeUploader.FIELD_TYPE_CACHED_OBJECT_ARRAY);
         // return
         mv.visitInsn(RETURN);
         mv.visitMaxs(2, 1);
@@ -168,8 +175,7 @@ public class UserDefinedBulletMaker {
         mv.visitLabel(tryLabel);
         mv.visitFieldInsn(GETSTATIC, className, CodeUploader.FIELD_SCRIPT_OBJECT, CodeUploader.FIELD_TYPE_SCRIPT_OBJECT);
         mv.visitFieldInsn(GETSTATIC, className, CodeUploader.FIELD_SCRIPT_FUNCTION, CodeUploader.FIELD_TYPE_SCRIPT_FUNCTION);
-        mv.visitInsn(ICONST_2);
-        mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+        mv.visitFieldInsn(GETSTATIC, className, CodeUploader.FIELD_CACHED_OBJECT_ARRAY, CodeUploader.FIELD_TYPE_CACHED_OBJECT_ARRAY);
         mv.visitInsn(DUP);
         mv.visitInsn(ICONST_0);
         mv.visitVarInsn(ALOAD, 0);

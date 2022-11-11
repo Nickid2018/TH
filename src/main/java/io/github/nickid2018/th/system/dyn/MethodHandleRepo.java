@@ -1,7 +1,9 @@
 package io.github.nickid2018.th.system.dyn;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import io.github.nickid2018.th.system.bullet.Bullet;
-import io.github.nickid2018.th.system.bullet.BulletDispenser;
+import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
 import io.github.nickid2018.th.system.compute.TimeLineRunner;
 import io.github.nickid2018.th.system.enemy.Boss;
 import io.github.nickid2018.th.system.enemy.Enemy;
@@ -11,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandle;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MethodHandleRepo {
 
@@ -25,12 +25,12 @@ public class MethodHandleRepo {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("Method Handle Repo");
 
-    private static final Map<ResourceLocation, MethodHandle> PLAYER_HANDLES = new HashMap<>();
-    private static final Map<ResourceLocation, MethodHandle> ENEMY_HANDLES = new HashMap<>();
-    private static final Map<ResourceLocation, MethodHandle> BULLET_HANDLES = new HashMap<>();
-    private static final Map<ResourceLocation, MethodHandle> BULLET_DISPENSER_HANDLES = new HashMap<>();
-    private static final Map<ResourceLocation, MethodHandle> BOSS_HANDLES = new HashMap<>();
-    private static final Map<ResourceLocation, MethodHandle> TIMELINE_HANDLES = new HashMap<>();
+    private static final BiMap<ResourceLocation, MethodHandle> PLAYER_HANDLES = HashBiMap.create();
+    private static final BiMap<ResourceLocation, MethodHandle> ENEMY_HANDLES = HashBiMap.create();
+    private static final BiMap<ResourceLocation, MethodHandle> BULLET_HANDLES = HashBiMap.create();
+    private static final BiMap<ResourceLocation, MethodHandle> BULLET_DISPENSER_HANDLES = HashBiMap.create();
+    private static final BiMap<ResourceLocation, MethodHandle> BOSS_HANDLES = HashBiMap.create();
+    private static final BiMap<ResourceLocation, MethodHandle> TIMELINE_HANDLES = HashBiMap.create();
 
     public static Player constructPlayer(ResourceLocation location, Object... args) {
         if (!PLAYER_HANDLES.containsKey(location))
@@ -119,5 +119,17 @@ public class MethodHandleRepo {
             case BOSS_HANDLE -> BOSS_HANDLES.put(location, handle);
             case TIMELINE_HANDLE -> TIMELINE_HANDLES.put(location, handle);
         }
+    }
+
+    public static ResourceLocation getHandleName(MethodHandle handle, int type) {
+        return switch (type) {
+            case PLAYER_HANDLE -> PLAYER_HANDLES.inverse().get(handle);
+            case ENEMY_HANDLE -> ENEMY_HANDLES.inverse().get(handle);
+            case BULLET_HANDLE -> BULLET_HANDLES.inverse().get(handle);
+            case BULLET_DISPENSER_HANDLE -> BULLET_DISPENSER_HANDLES.inverse().get(handle);
+            case BOSS_HANDLE -> BOSS_HANDLES.inverse().get(handle);
+            case TIMELINE_HANDLE -> TIMELINE_HANDLES.inverse().get(handle);
+            default -> null;
+        };
     }
 }

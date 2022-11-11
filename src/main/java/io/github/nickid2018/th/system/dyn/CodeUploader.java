@@ -4,8 +4,10 @@ public class CodeUploader extends ClassLoader {
 
     public static final String FIELD_SCRIPT_OBJECT = "scriptObject";
     public static final String FIELD_SCRIPT_FUNCTION = "scriptFunction";
+    public static final String FIELD_CACHED_OBJECT_ARRAY = "cachedObjectArray";
     public static final String FIELD_TYPE_SCRIPT_OBJECT = "Lorg/openjdk/nashorn/api/scripting/ScriptObjectMirror;";
     public static final String FIELD_TYPE_SCRIPT_FUNCTION = "Lorg/openjdk/nashorn/internal/runtime/ScriptFunction;";
+    public static final String FIELD_TYPE_CACHED_OBJECT_ARRAY = "[Ljava/lang/Object;";
     public static final String METHOD_TICK = "tick";
     public static final String METHOD_TICK_DESC = "(J)V";
     public static final String CTOR = "<init>";

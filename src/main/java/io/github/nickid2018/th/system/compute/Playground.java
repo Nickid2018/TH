@@ -5,14 +5,18 @@ import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.phys.Sphere;
 import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.bullet.BulletBasicData;
-import io.github.nickid2018.th.system.bullet.BulletDispenser;
+import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
+import io.github.nickid2018.th.system.dyn.UserDefinedBulletMaker;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.player.Player;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.math.AABB;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import org.joml.Vector2f;
 
+import java.lang.invoke.MethodHandle;
 import java.util.*;
 
 // 384x448
@@ -48,6 +52,7 @@ public class Playground {
     protected Random random = new Random();
 
     BulletBasicData bulletBasicData, bulletBasicData2;
+    MethodHandle handle;
 
     public Playground() {
         playgroundBulletAABB = AABB.newAABB(-20, -20, PLAYGROUND_WIDTH + 20, PLAYGROUND_HEIGHT + 20);
@@ -56,8 +61,10 @@ public class Playground {
                 ResourceLocation.fromString("bullets/ball.json"), BulletBasicData.CODEC);
         bulletBasicData2 = PackManager.createObject(
                 ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
+        handle = PackManager.createObject(ResourceLocation.fromString("test:paths/test.json"), UserDefinedBulletMaker.CODEC).getConstructor();
     }
 
+    @SneakyThrows
     public void update() {
         tickTime++;
 
@@ -66,6 +73,14 @@ public class Playground {
         bullets.forEach(b -> b.tick(tickTime));
         enemies.forEach(e -> e.tick(tickTime));
         bulletDispensers.forEach(d -> d.tick(tickTime));
+
+        if (tickTime % 5 == 0) {
+            for (int i = 0; i < 20; i++) {
+                int x = random.nextInt(PLAYGROUND_WIDTH);
+                Bullet bullet = (Bullet) handle.invoke(this, bulletBasicData, "yellow", new Vector2f(x, -2));
+                bullets.add(bullet);
+            }
+        }
 
         // --- Test Codes
         List<Bullet> bulletList = playerHitItems().stream()

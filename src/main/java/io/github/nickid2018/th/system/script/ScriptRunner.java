@@ -104,7 +104,11 @@ public class ScriptRunner {
                 loadPackage(location);
             String objectName = Objects.requireNonNull(
                     PackManager.getPack(location.namespace())).getScriptVariableName(location.path());
-            return (ScriptObjectMirror) getJSObject(objectName).getMember(name);
+            Object obj = getJSObject(objectName).getMember(name);
+            if (obj instanceof ScriptObjectMirror)
+                return (ScriptObjectMirror) obj;
+            JS_LOGGER.warn("No member {} in {}", name, location);
+            return null;
         } catch (Exception e) {
             JS_LOGGER.error("Failed to load script " + location, e);
             return null;
