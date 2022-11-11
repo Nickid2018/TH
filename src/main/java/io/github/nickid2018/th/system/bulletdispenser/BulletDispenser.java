@@ -12,6 +12,8 @@ public abstract class BulletDispenser implements HittableItem {
     protected final Playground playground;
     protected final Enemy enemy;
 
+    protected int dispenseCount = 0;
+
     public BulletDispenser(Playground playground) {
         this.playground = playground;
         enemy = null;

@@ -51,10 +51,8 @@ public class UserDefinedBulletMaker {
     }
 
     public MethodHandle getConstructor() {
-        if (constructor == null) {
+        if (constructor == null)
             constructor = makeClass();
-            MethodHandleRepo.putHandle(location, constructor, MethodHandleRepo.BULLET_HANDLE);
-        }
         return constructor;
     }
 

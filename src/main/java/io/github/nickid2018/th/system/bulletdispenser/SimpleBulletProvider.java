@@ -21,6 +21,11 @@ public record SimpleBulletProvider(BulletBasicData bulletBasicData,
     @Override
     @SneakyThrows
     public Bullet getBullet(BulletDispenser dispenser, Vector2f position) {
-        return (Bullet) definition.getConstructor().invoke(dispenser.getPlayground(), bulletBasicData, variant, position);
+        return (Bullet) definition.constructor().invoke(dispenser.getPlayground(), bulletBasicData, variant, position);
+    }
+
+    @Override
+    public String name() {
+        return "simple";
     }
 }
