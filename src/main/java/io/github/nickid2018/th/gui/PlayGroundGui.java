@@ -155,7 +155,7 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
 
     private void drawInstanced(Bullet bullet, int toDraw) {
         if (bullet.getBulletBasicData().isHasTint())
-            Shaders.INSTANCED_COLOR.set3fv(bullet.getColor());
+            Shaders.INSTANCED_COLOR.set3fv(bullet.color);
         else
             Shaders.INSTANCED_COLOR.set3fv(1, 1, 1);
 

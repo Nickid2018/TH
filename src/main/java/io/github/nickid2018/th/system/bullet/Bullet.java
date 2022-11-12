@@ -23,11 +23,11 @@ public abstract class Bullet implements HittableItem {
     @Getter
     protected long lifeTime;
 
+    @Setter
     @Getter
     protected float angle;
 
-    @Getter
-    protected Vector3f color;
+    public Vector3f color;
 
     @Getter
     @Setter

@@ -40,7 +40,7 @@ public class CountSelectBulletProvider implements BulletProvider {
 
     @Override
     public Bullet getBullet(BulletDispenser dispenser, Vector2f position) {
-        int now = dispenser.getDispenseCount() % sum;
+        int now = dispenser.getDispenseStep() % sum;
         int index = CollectionUtil.binarySearch(counts, now);
         return providers.get(index).getBullet(dispenser, position);
     }

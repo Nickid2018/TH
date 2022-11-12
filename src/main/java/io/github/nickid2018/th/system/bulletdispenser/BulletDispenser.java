@@ -5,6 +5,7 @@ import io.github.nickid2018.th.system.compute.HittableItem;
 import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public abstract class BulletDispenser implements HittableItem {
@@ -12,7 +13,10 @@ public abstract class BulletDispenser implements HittableItem {
     protected final Playground playground;
     protected final Enemy enemy;
 
-    protected int dispenseCount = 0;
+    protected int lifeTime = -1;
+    protected int dispenseStep = 0;
+    @Setter
+    protected int dispenseInterval = 5;
 
     public BulletDispenser(Playground playground) {
         this.playground = playground;
@@ -26,9 +30,15 @@ public abstract class BulletDispenser implements HittableItem {
 
     @Override
     public void tick(long tickTime) {
-        if (enemy != null && enemy.isDead())
+        lifeTime++;
+        if (dispenseInterval != 0 && lifeTime % dispenseInterval != 0)
             return;
+        if (enemy != null && enemy.isDead()) {
+            playground.dispose(this);
+            return;
+        }
         dispenseBullet(tickTime);
+        dispenseStep++;
     }
 
     @Override
