@@ -13,7 +13,7 @@ public interface HittableItem extends Tickable {
             dispose();
     }
 
-    default void move(float x, float y) {
+    default void moveTo(float x, float y) {
         getHitSphere().move(x, y);
     }
 

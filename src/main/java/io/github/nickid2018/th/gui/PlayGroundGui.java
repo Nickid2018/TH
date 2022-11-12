@@ -190,7 +190,7 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
             }
             getHittableItemMatrixInBuffer(bullet, toDraw[0]);
             if (bullet.getBulletBasicData().isHasRenderAngle())
-                matrices.get(toDraw[0]).rotate(bullet.getAngle(), 0, 0, 1);
+                matrices.get(toDraw[0]).rotate((float) (-bullet.getAngle() + Math.PI / 2), 0, 0, 1);
             toDraw[0]++;
         });
         if (lastBullet[0] != null)

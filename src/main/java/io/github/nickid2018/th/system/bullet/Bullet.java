@@ -10,6 +10,8 @@ import org.joml.Vector3f;
 
 public abstract class Bullet implements HittableItem {
 
+    private static int bulletIDCounter = 0;
+
     @Getter
     protected final Playground playground;
 
@@ -33,6 +35,8 @@ public abstract class Bullet implements HittableItem {
     @Setter
     protected boolean grazed;
 
+    protected int bulletID;
+
     public Bullet(Playground playground, BulletBasicData bulletBasicData, String variant, Vector2f position) {
         this.playground = playground;
         this.bulletBasicData = bulletBasicData;
@@ -40,6 +44,7 @@ public abstract class Bullet implements HittableItem {
         this.sphere = new Sphere(position, bulletBasicData.getRadius());
         lifeTime = 0;
         grazed = false;
+        bulletID = bulletIDCounter++;
     }
 
     @Override
@@ -50,6 +55,11 @@ public abstract class Bullet implements HittableItem {
     @Override
     public void tick(long tickTime) {
         lifeTime++;
+    }
+
+    @Override
+    public int hashCode() {
+        return bulletID;
     }
 
     public boolean similar(Bullet o) {

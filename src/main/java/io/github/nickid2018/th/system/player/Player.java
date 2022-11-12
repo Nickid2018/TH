@@ -84,7 +84,7 @@ public abstract class Player implements HittableItem {
         else if (validVertical)
             sphere.move(0, ((moveFlag & 4) == 0 ? 1 : -1) * speed);
 
-        sphere.x = Math.clamp(0, Playground.PLAYGROUND_WIDTH, sphere.x);
-        sphere.y = Math.clamp(0, Playground.PLAYGROUND_HEIGHT, sphere.y);
+        sphere.x = Math.clamp(10, Playground.PLAYGROUND_WIDTH - 10, sphere.x);
+        sphere.y = Math.clamp(12, Playground.PLAYGROUND_HEIGHT - 12, sphere.y);
     }
 }

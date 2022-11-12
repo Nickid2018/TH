@@ -5,18 +5,19 @@ import io.github.nickid2018.th.pack.PackManager;
 import io.github.nickid2018.th.phys.Sphere;
 import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.bullet.BulletBasicData;
+import io.github.nickid2018.th.system.bulletdispenser.AimedShotBulletDispenser;
 import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
-import io.github.nickid2018.th.system.dyn.UserDefinedBulletProvider;
+import io.github.nickid2018.th.system.bulletdispenser.variant.SimpleBulletVariantProvider;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.player.Player;
+import io.github.nickid2018.th.system.valueprovider.floating.ConstantFloat;
+import io.github.nickid2018.th.system.valueprovider.integer.ConstantInt;
 import io.github.nickid2018.th.util.ResourceLocation;
 import io.github.nickid2018.tiny2d.math.AABB;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.joml.Vector2f;
 
-import java.lang.invoke.MethodHandle;
 import java.util.*;
 
 // 384x448
@@ -51,17 +52,21 @@ public class Playground {
     @Getter
     protected Random random = new Random();
 
-    BulletBasicData bulletBasicData, bulletBasicData2;
-    MethodHandle handle;
+    AimedShotBulletDispenser dispenser;
 
     public Playground() {
         playgroundBulletAABB = AABB.newAABB(-20, -20, PLAYGROUND_WIDTH + 20, PLAYGROUND_HEIGHT + 20);
 
-        bulletBasicData = PackManager.createObject(
-                ResourceLocation.fromString("bullets/ball.json"), BulletBasicData.CODEC);
-        bulletBasicData2 = PackManager.createObject(
-                ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
-        handle = PackManager.createObject(ResourceLocation.fromString("test:paths/test.json"), UserDefinedBulletProvider.CODEC).getConstructor();
+        BulletBasicData bulletBasicData = PackManager.createObject(
+                ResourceLocation.fromString("bullets/petal.json"), BulletBasicData.CODEC);
+
+        dispenser = new AimedShotBulletDispenser(this,
+                new SimpleBulletVariantProvider(bulletBasicData, "red"),
+                new ConstantInt(3),
+                new ConstantFloat(0.3f),
+                new ConstantFloat(4f),
+                null);
+        addBulletDispenser(dispenser);
     }
 
     @SneakyThrows
@@ -70,19 +75,15 @@ public class Playground {
 
         player.tick(tickTime);
 
+        float a = (float) ((System.currentTimeMillis() % 10000) / 1000f * Math.PI);
+        float x = (float) (Math.sin(a) * 100 + PLAYGROUND_WIDTH / 2);
+        float y = (float) (Math.cos(a) * 100 + PLAYGROUND_HEIGHT / 2 - 100);
+        dispenser.moveTo(x, y);
+
         bullets.forEach(b -> b.tick(tickTime));
         enemies.forEach(e -> e.tick(tickTime));
         bulletDispensers.forEach(d -> d.tick(tickTime));
 
-        if (tickTime % 5 == 0) {
-            for (int i = 0; i < 20; i++) {
-                int x = random.nextInt(PLAYGROUND_WIDTH);
-                Bullet bullet = (Bullet) handle.invoke(this, bulletBasicData, "yellow", new Vector2f(x, -2));
-                bullets.add(bullet);
-            }
-        }
-
-        // --- Test Codes
         List<Bullet> bulletList = playerHitItems().stream()
                 .filter(i -> i instanceof Bullet)
                 .map(i -> (Bullet) i).toList();

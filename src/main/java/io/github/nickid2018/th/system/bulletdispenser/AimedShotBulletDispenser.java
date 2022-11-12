@@ -7,7 +7,6 @@ import io.github.nickid2018.th.system.bullet.path.StraightBulletPath;
 import io.github.nickid2018.th.system.bulletdispenser.variant.BulletVariantProvider;
 import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.th.system.enemy.Enemy;
-import io.github.nickid2018.th.system.valueprovider.floating.ConstantFloat;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
 import io.github.nickid2018.th.system.valueprovider.integer.IntProvider;
 import io.github.nickid2018.th.system.valueprovider.vector.ConstantVector2f;
@@ -26,7 +25,6 @@ public class AimedShotBulletDispenser extends BulletDispenser {
 
     private final int waysValue;
     private final float maxAngleValue;
-    private final FloatProvider speedValue;
 
     private final float angle;
 
@@ -40,7 +38,6 @@ public class AimedShotBulletDispenser extends BulletDispenser {
         this.speed = speed;
         waysValue = ways.getValue(this);
         maxAngleValue = maxAngle.getValue(this);
-        speedValue = new ConstantFloat(speed.getValue(this));
         angle = maxAngleValue / (waysValue - 1);
     }
 
@@ -55,10 +52,11 @@ public class AimedShotBulletDispenser extends BulletDispenser {
             Vector2f dir = new Vector2f((float) Math.cos(angle), (float) Math.sin(angle));
             String variant = provider.getVariant(this);
             BulletBasicData data = provider.getBulletBasicData(this);
-            StraightBulletPath path = new StraightBulletPath(-1, speedValue, new ConstantVector2f(dir));
+            StraightBulletPath path = new StraightBulletPath(-1, speed, new ConstantVector2f(dir));
             Long2ObjectAVLTreeMap<BulletPath> map = new Long2ObjectAVLTreeMap<>();
             map.put(0L, path);
             PathControllingBullet bullet = new PathControllingBullet(playground, data, variant, thisPos, map);
+            bullet.setAngle(angle);
             playground.addBullet(bullet);
         }
     }

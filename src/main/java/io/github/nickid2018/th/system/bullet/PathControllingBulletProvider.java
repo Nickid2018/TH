@@ -7,15 +7,11 @@ import io.github.nickid2018.th.system.bullet.path.BulletPath;
 import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
 public record PathControllingBulletProvider(Long2ObjectMap<BulletPath> pathList) implements BulletProvider {
 
     public static final Codec<PathControllingBulletProvider> CODEC = RecordCodecBuilder.create(instance -> instance.group(

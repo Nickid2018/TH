@@ -18,6 +18,9 @@ public abstract class BulletDispenser implements HittableItem {
     @Setter
     protected int dispenseInterval = 5;
 
+    private float x;
+    private float y;
+
     public BulletDispenser(Playground playground, Enemy enemy) {
         this.playground = playground;
         this.enemy = enemy;
@@ -37,8 +40,14 @@ public abstract class BulletDispenser implements HittableItem {
     }
 
     @Override
+    public void moveTo(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
     public Sphere getHitSphere() {
-        return enemy == null ? new Sphere(0, 0, 0) : enemy.getHitSphere();
+        return enemy == null ? new Sphere(x, y, 0) : enemy.getHitSphere();
     }
 
     protected abstract void dispenseBullet(long tickTime);
