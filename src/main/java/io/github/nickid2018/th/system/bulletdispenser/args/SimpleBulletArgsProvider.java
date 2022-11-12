@@ -1,14 +1,18 @@
-package io.github.nickid2018.th.system.bulletdispenser;
+package io.github.nickid2018.th.system.bulletdispenser.args;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.system.bullet.Bullet;
+import io.github.nickid2018.th.system.bullet.BulletProvider;
+import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
+import io.github.nickid2018.th.system.bulletdispenser.variant.BulletVariantProvider;
 import io.github.nickid2018.th.system.valueprovider.ValueProvider;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
 import io.github.nickid2018.th.system.valueprovider.vector.Vector2fProvider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.joml.Vector2f;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -35,10 +39,12 @@ public class SimpleBulletArgsProvider implements BulletArgsProvider {
 
     @Override
     @SneakyThrows
-    public List<Bullet> getBullets(BulletDispenser dispenser, BulletProvider provider) {
+    public List<Bullet> getBullets(BulletDispenser dispenser, BulletVariantProvider variantProvider, BulletProvider bulletProvider) {
         List<Bullet> bullets = new ArrayList<>();
         for (int i = 0; i < positions.size(); i++) {
-            Bullet bullet = provider.getBullet(dispenser, positions.get(i).getValue(dispenser));
+            Vector2f vector = positions.get(i).getValue(dispenser);
+            Bullet bullet = bulletProvider.getBullet(dispenser,
+                    variantProvider.getBulletBasicData(dispenser), variantProvider.getVariant(dispenser), vector);
             if (i < angles.size())
                 bullet.setAngle(angles.get(i).getValue(dispenser));
             bullets.add(bullet);

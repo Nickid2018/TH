@@ -18,11 +18,6 @@ public abstract class BulletDispenser implements HittableItem {
     @Setter
     protected int dispenseInterval = 5;
 
-    public BulletDispenser(Playground playground) {
-        this.playground = playground;
-        enemy = null;
-    }
-
     public BulletDispenser(Playground playground, Enemy enemy) {
         this.playground = playground;
         this.enemy = enemy;

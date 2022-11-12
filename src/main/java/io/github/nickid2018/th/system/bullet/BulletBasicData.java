@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.nickid2018.th.gui.ImageRepository;
 import io.github.nickid2018.th.gui.PlayGroundGui;
 import io.github.nickid2018.th.gui.SpriteDefinition;
+import io.github.nickid2018.th.system.compute.Registry;
 import io.github.nickid2018.tiny2d.buffer.IndexBufferProvider;
 import io.github.nickid2018.tiny2d.buffer.VertexArray;
 import io.github.nickid2018.tiny2d.buffer.VertexArrayBuilder;
@@ -49,6 +50,8 @@ public class BulletBasicData implements Comparable<BulletBasicData> {
                     Codec.unboundedMap(Codec.STRING, SpriteDefinition.CODEC)
             ).fieldOf("sprite").forGetter(BulletBasicData::getSpriteData)
     ).apply(instance, BulletBasicData::new));
+
+    public static final Registry<BulletBasicData> REGISTRY = new Registry<>(CODEC);
 
     public BulletBasicData(float radius, AABB renderAABB,
                            boolean hasRenderAngle, boolean hasTint, int priority,

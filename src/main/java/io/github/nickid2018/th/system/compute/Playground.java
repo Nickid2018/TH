@@ -6,7 +6,7 @@ import io.github.nickid2018.th.phys.Sphere;
 import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.bullet.BulletBasicData;
 import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
-import io.github.nickid2018.th.system.dyn.UserDefinedBulletMaker;
+import io.github.nickid2018.th.system.dyn.UserDefinedBulletProvider;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.player.Player;
 import io.github.nickid2018.th.util.ResourceLocation;
@@ -61,7 +61,7 @@ public class Playground {
                 ResourceLocation.fromString("bullets/ball.json"), BulletBasicData.CODEC);
         bulletBasicData2 = PackManager.createObject(
                 ResourceLocation.fromString("bullets/orbs.json"), BulletBasicData.CODEC);
-        handle = PackManager.createObject(ResourceLocation.fromString("test:paths/test.json"), UserDefinedBulletMaker.CODEC).getConstructor();
+        handle = PackManager.createObject(ResourceLocation.fromString("test:paths/test.json"), UserDefinedBulletProvider.CODEC).getConstructor();
     }
 
     @SneakyThrows

@@ -1,36 +1,14 @@
 package io.github.nickid2018.th.system.bullet;
 
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import io.github.nickid2018.th.system.bullet.path.BulletPath;
 import io.github.nickid2018.th.system.compute.Playground;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.Getter;
 import org.joml.Vector2f;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PathControllingBullet extends Bullet {
 
     public static final Vector2f POSITIVE_X = new Vector2f(1, 0);
-
-    public static final Codec<Long2ObjectMap<BulletPath>> PATH_LIST_CODEC = Codec.compoundList(
-            Codec.STRING, BulletPath.CODEC
-    ).xmap(
-            list -> {
-                Long2ObjectMap<BulletPath> map = new Long2ObjectOpenHashMap<>();
-                for (Pair<String, BulletPath> longBulletPathPair : list)
-                    map.put(Long.parseLong(longBulletPathPair.getFirst()), longBulletPathPair.getSecond());
-                return map;
-            },
-            map -> {
-                List<Pair<String, BulletPath>> list = new ArrayList<>();
-                map.forEach((l, p) -> list.add(new Pair<>(Long.toString(l), p)));
-                return list;
-            }
-    );
 
     @Getter
     private final Long2ObjectMap<BulletPath> paths;

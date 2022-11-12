@@ -3,8 +3,14 @@ package io.github.nickid2018.th.system.dyn;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.nickid2018.th.system.bullet.Bullet;
+import io.github.nickid2018.th.system.bullet.BulletBasicData;
+import io.github.nickid2018.th.system.bullet.BulletProvider;
+import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
 import io.github.nickid2018.th.util.ResourceLocation;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import org.joml.Vector2f;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
@@ -20,12 +26,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.objectweb.asm.Opcodes.*;
 
-public class UserDefinedBulletMaker {
+public class UserDefinedBulletProvider implements BulletProvider {
 
-    public static final Codec<UserDefinedBulletMaker> CODEC = RecordCodecBuilder.create(app -> app.group(
-            ResourceLocation.CODEC.fieldOf("location").forGetter(UserDefinedBulletMaker::getLocation),
-            Codec.compoundList(Codec.STRING, Codec.STRING).fieldOf("args").forGetter(UserDefinedBulletMaker::getFields)
-    ).apply(app, UserDefinedBulletMaker::new));
+    public static final Codec<UserDefinedBulletProvider> CODEC = RecordCodecBuilder.create(app -> app.group(
+            ResourceLocation.CODEC.fieldOf("location").forGetter(UserDefinedBulletProvider::getLocation),
+            Codec.compoundList(Codec.STRING, Codec.STRING).fieldOf("args").forGetter(UserDefinedBulletProvider::getFields)
+    ).apply(app, UserDefinedBulletProvider::new));
 
     public static final String CTOR_DESC = "(Lio/github/nickid2018/th/system/compute/Playground;" +
             "Lio/github/nickid2018/th/system/bullet/BulletBasicData;Ljava/lang/String;Lorg/joml/Vector2f;)V";
@@ -39,15 +45,17 @@ public class UserDefinedBulletMaker {
     private final List<Pair<String, String>> fields;
 
     @Getter
-    private final String className;
+    private String className;
     @Getter
     private Class<?> clazz;
     private MethodHandle constructor;
 
-    public UserDefinedBulletMaker(ResourceLocation location, List<Pair<String, String>> fields) {
+    public UserDefinedBulletProvider(ResourceLocation location, List<Pair<String, String>> fields) {
         this.location = location;
         this.fields = fields;
-        className = PREFIX + COUNTER.getAndIncrement();
+        constructor = MethodHandleRepo.getHandle(location, MethodHandleRepo.BULLET_HANDLE);
+        if (constructor == null)
+            className = PREFIX + COUNTER.getAndIncrement();
     }
 
     public MethodHandle getConstructor() {
@@ -207,5 +215,16 @@ public class UserDefinedBulletMaker {
         mv.visitInsn(RETURN);
         mv.visitMaxs(6, 3);
         mv.visitEnd();
+    }
+
+    @SneakyThrows
+    @Override
+    public Bullet getBullet(BulletDispenser dispenser, BulletBasicData data, String variant, Vector2f position) {
+        return (Bullet) getConstructor().invoke(dispenser.getPlayground(), data, variant, position);
+    }
+
+    @Override
+    public String name() {
+        return "user";
     }
 }
