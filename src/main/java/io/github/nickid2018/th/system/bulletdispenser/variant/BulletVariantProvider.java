@@ -18,6 +18,8 @@ public interface BulletVariantProvider {
 
     BulletBasicData getBulletBasicData(BulletDispenser dispenser);
     String getVariant(BulletDispenser dispenser);
+    boolean hasDefinedPriority(BulletDispenser dispenser);
+    int getPriority(BulletDispenser dispenser);
 
     String name();
 }

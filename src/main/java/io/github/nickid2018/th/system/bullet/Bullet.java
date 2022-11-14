@@ -37,6 +37,10 @@ public abstract class Bullet implements HittableItem {
 
     protected int bulletID;
 
+    @Setter
+    @Getter
+    private int priority;
+
     public Bullet(Playground playground, BulletBasicData bulletBasicData, String variant, Vector2f position) {
         this.playground = playground;
         this.bulletBasicData = bulletBasicData;
@@ -44,6 +48,7 @@ public abstract class Bullet implements HittableItem {
         this.sphere = new Sphere(position, bulletBasicData.getRadius());
         lifeTime = 0;
         grazed = false;
+        priority = bulletBasicData.getPriority();
         bulletID = bulletIDCounter++;
     }
 

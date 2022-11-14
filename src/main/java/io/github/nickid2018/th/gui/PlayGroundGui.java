@@ -28,6 +28,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class PlayGroundGui extends RenderComponent implements KeyboardInput {
@@ -172,27 +173,26 @@ public class PlayGroundGui extends RenderComponent implements KeyboardInput {
         program.use();
         Bullet[] lastBullet = {null};
         int[] toDraw = {0};
-        playground.getBullets().stream().sorted((b1, b2) -> {
-            int i = b1.getBulletBasicData().compareTo(b2.getBulletBasicData());
-            if (i == 0)
-                return b1.getVariant().compareTo(b2.getVariant());
-            return i;
-        }).forEach(bullet -> {
-            if (lastBullet[0] == null)
-                lastBullet[0] = bullet;
-            else if (!lastBullet[0].similar(bullet)) {
-                drawInstanced(lastBullet[0], toDraw[0]);
-                lastBullet[0] = bullet;
-                toDraw[0] = 0;
-            } else if (toDraw[0] == 100) {
-                drawInstanced(lastBullet[0], 100);
-                toDraw[0] = 0;
-            }
-            getHittableItemMatrixInBuffer(bullet, toDraw[0]);
-            if (bullet.getBulletBasicData().isHasRenderAngle())
-                matrices.get(toDraw[0]).rotate((float) (-bullet.getAngle() + Math.PI / 2), 0, 0, 1);
-            toDraw[0]++;
-        });
+        playground.getBullets().stream()
+                .sorted(Comparator.comparing(Bullet::getBulletBasicData)
+                        .thenComparingInt(Bullet::getPriority)
+                        .thenComparing(Bullet::getVariant)
+                ).forEach(bullet -> {
+                    if (lastBullet[0] == null)
+                        lastBullet[0] = bullet;
+                    else if (!lastBullet[0].similar(bullet)) {
+                        drawInstanced(lastBullet[0], toDraw[0]);
+                        lastBullet[0] = bullet;
+                        toDraw[0] = 0;
+                    } else if (toDraw[0] == 100) {
+                        drawInstanced(lastBullet[0], 100);
+                        toDraw[0] = 0;
+                    }
+                    getHittableItemMatrixInBuffer(bullet, toDraw[0]);
+                    if (bullet.getBulletBasicData().isHasRenderAngle())
+                        matrices.get(toDraw[0]).rotate((float) (-bullet.getAngle() + Math.PI / 2), 0, 0, 1);
+                    toDraw[0]++;
+                });
         if (lastBullet[0] != null)
             drawInstanced(lastBullet[0], toDraw[0]);
 

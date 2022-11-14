@@ -30,18 +30,20 @@ public class StraightBulletPath extends BulletPath {
     }
 
     @Override
-    public void tick(long tickTime, PathControllingBullet bullet) {
+    public float tick(long tickTime, PathControllingBullet bullet) {
         if (continueTime > 0 && tickTime > continueTime)
-            return;
+            return 0;
         Vector2f movePerTick = (Vector2f) bullet.getStoredArgs()[0];
         bullet.getHitSphere().move(movePerTick.x, movePerTick.y);
         if (bullet.getPlayground().isItemOutsidePlayground(bullet))
             bullet.getPlayground().dispose(bullet);
+        return (float) bullet.getStoredArgs()[1];
     }
 
     @Override
     public Object[] createArguments(PathControllingBullet bullet) {
-        return new Object[] { direction.getValue(bullet).normalize(speed.getValue(bullet)) };
+        Vector2f dir = direction.getValue(bullet);
+        return new Object[] { dir.normalize(speed.getValue(bullet)), dir.angle(PathControllingBullet.POSITIVE_X)};
     }
 
     @Override

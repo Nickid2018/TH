@@ -19,4 +19,9 @@ public record ConstantFloat(@Getter float value) implements FloatProvider {
     public Float getValue(HittableItem item) {
         return value;
     }
+
+    @Override
+    public String getComputeType() {
+        return "constant";
+    }
 }

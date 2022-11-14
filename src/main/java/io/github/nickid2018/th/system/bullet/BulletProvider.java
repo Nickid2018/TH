@@ -12,7 +12,7 @@ public interface BulletProvider {
 
     Codec<BulletProvider> FILE_CODEC = Codec.STRING.dispatch(BulletProvider::name, BulletProvider::getProvider);
     Codec<BulletProvider> CODEC = Codec.either(
-            ResourceLocation.CODEC.xmap(BulletProvider.REGISTRY::get, BulletProvider.REGISTRY::getKey),
+            ResourceLocation.CODEC.xmap(BulletProvider.REGISTRY::get, BulletProvider.REGISTRY::key),
             FILE_CODEC
     ).xmap(e -> e.map(b -> b, b -> b), Either::right);
 

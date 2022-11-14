@@ -22,7 +22,8 @@ public class Registry<T> {
     }
 
     public T get(ResourceLocation location) {
-        if (!registry.containsKey(location.normalize())) {
+        location = location.normalize();
+        if (!registry.containsKey(location)) {
             T object = PackManager.createObject(location, codec);
             if (object != null)
                 register(location, object);
@@ -30,7 +31,7 @@ public class Registry<T> {
         return registry.get(location);
     }
 
-    public ResourceLocation getKey(T object) {
+    public ResourceLocation key(T object) {
         return registry.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(object))
                 .findFirst()

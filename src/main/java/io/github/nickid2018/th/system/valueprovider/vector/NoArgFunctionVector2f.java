@@ -24,7 +24,7 @@ public class NoArgFunctionVector2f extends NoArgFunction<Vector2f> implements Ve
     public static final ValueFunction<Vector2f> RANDOM = new ValueFunction<>("random") {
         @Override
         protected Vector2f getValue(HittableItem item, List<ValueProvider<?>> arguments) {
-            float angle = (float) (Math.random() * 2 * Math.PI);
+            float angle = (float) (item.getPlayground().getRandom().nextFloat() * 2 * Math.PI);
             return new Vector2f(Math.cos(angle), Math.sin(angle));
         }
     };

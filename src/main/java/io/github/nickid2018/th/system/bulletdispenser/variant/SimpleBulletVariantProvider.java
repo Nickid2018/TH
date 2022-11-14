@@ -7,13 +7,19 @@ import io.github.nickid2018.th.system.bulletdispenser.BulletDispenser;
 import io.github.nickid2018.th.util.ResourceLocation;
 
 public record SimpleBulletVariantProvider(BulletBasicData bulletBasicData,
-                                          String variant) implements BulletVariantProvider {
+                                          String variant,
+                                          int priority) implements BulletVariantProvider {
 
     public static final Codec<SimpleBulletVariantProvider> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.xmap(BulletBasicData.REGISTRY::get, BulletBasicData.REGISTRY::getKey)
+            ResourceLocation.CODEC.xmap(BulletBasicData.REGISTRY::get, BulletBasicData.REGISTRY::key)
                     .fieldOf("data").forGetter(SimpleBulletVariantProvider::bulletBasicData),
-            Codec.STRING.optionalFieldOf("variant", "default").forGetter(SimpleBulletVariantProvider::variant)
+            Codec.STRING.optionalFieldOf("variant", "default").forGetter(SimpleBulletVariantProvider::variant),
+            Codec.INT.optionalFieldOf("priority", Integer.MIN_VALUE).forGetter(SimpleBulletVariantProvider::priority)
     ).apply(instance, SimpleBulletVariantProvider::new));
+
+    public SimpleBulletVariantProvider(BulletBasicData bulletBasicData, String variant) {
+        this(bulletBasicData, variant, Integer.MIN_VALUE);
+    }
 
     @Override
     public BulletBasicData getBulletBasicData(BulletDispenser dispenser) {
@@ -23,6 +29,14 @@ public record SimpleBulletVariantProvider(BulletBasicData bulletBasicData,
     @Override
     public String getVariant(BulletDispenser dispenser) {
         return variant;
+    }
+
+    public boolean hasDefinedPriority(BulletDispenser dispenser) {
+        return priority != Integer.MIN_VALUE;
+    }
+
+    public int getPriority(BulletDispenser dispenser) {
+        return priority;
     }
 
     @Override

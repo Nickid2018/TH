@@ -41,14 +41,27 @@ public class CountSelectBulletVariantProvider implements BulletVariantProvider {
 
     @Override
     public BulletBasicData getBulletBasicData(BulletDispenser dispenser) {
-        int index = CollectionUtil.binarySearch(counts, dispenser.getDispenseStep() % sum);
-        return providers.get(index).getBulletBasicData(dispenser);
+        return getProvider(dispenser).getBulletBasicData(dispenser);
     }
 
     @Override
     public String getVariant(BulletDispenser dispenser) {
+        return getProvider(dispenser).getVariant(dispenser);
+    }
+
+    @Override
+    public boolean hasDefinedPriority(BulletDispenser dispenser) {
+        return getProvider(dispenser).hasDefinedPriority(dispenser);
+    }
+
+    @Override
+    public int getPriority(BulletDispenser dispenser) {
+        return getProvider(dispenser).getPriority(dispenser);
+    }
+
+    private BulletVariantProvider getProvider(BulletDispenser dispenser) {
         int index = CollectionUtil.binarySearch(counts, dispenser.getDispenseStep() % sum);
-        return providers.get(index).getVariant(dispenser);
+        return providers.get(index);
     }
 
     @Override

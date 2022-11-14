@@ -5,9 +5,11 @@ import io.github.nickid2018.th.system.valueprovider.ValueProvider;
 
 public interface FloatProvider extends ValueProvider<Float> {
 
-     default String getValueProviderType() {
+    default String getValueProviderType() {
         return "float";
-     }
+    }
+
+    String getComputeType();
 
     Codec<FloatProvider> CODEC = Codec.STRING.xmap(s -> null, FloatProvider::toString);
 }

@@ -15,7 +15,7 @@ public abstract class BulletPath {
         };
     }
 
-    public abstract void tick(long runningTick, PathControllingBullet bullet);
+    public abstract float tick(long runningTick, PathControllingBullet bullet);
 
     public abstract Object[] createArguments(PathControllingBullet bullet);
 

@@ -32,10 +32,7 @@ public class PathControllingBullet extends Bullet {
             lastTick = lifeTime;
         }
         Vector2f lastPos = sphere.getPosition();
-        currentPath.tick(lifeTime - lastTick, this);
-        Vector2f newPos = sphere.getPosition();
-        Vector2f dir = newPos.sub(lastPos);
-        angle = dir.angle(POSITIVE_X);
+        angle = currentPath.tick(lifeTime - lastTick, this);
         super.tick(tickTime);
     }
 }
