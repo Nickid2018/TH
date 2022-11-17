@@ -1,16 +1,12 @@
 package io.github.nickid2018.th.system.bulletdispenser;
 
 import io.github.nickid2018.th.system.bullet.BulletBasicData;
-import io.github.nickid2018.th.system.bullet.PathControllingBullet;
-import io.github.nickid2018.th.system.bullet.path.BulletPath;
-import io.github.nickid2018.th.system.bullet.path.StraightBulletPath;
+import io.github.nickid2018.th.system.bullet.StraightBullet;
 import io.github.nickid2018.th.system.bulletdispenser.variant.BulletVariantProvider;
 import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
 import io.github.nickid2018.th.system.valueprovider.integer.IntProvider;
-import io.github.nickid2018.th.system.valueprovider.vector.ConstantVector2f;
-import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import lombok.Getter;
 import org.joml.Vector2f;
 
@@ -43,18 +39,19 @@ public class RoundShotBulletDispenser extends BulletDispenser {
     @Override
     protected void dispenseBullet(long tickTime) {
         float angle = initialAngle.getValue(this);
+        float radius = this.radius.getValue(this);
+        float speed = this.speed.getValue(this);
+        Vector2f thisPos = getHitSphere().getPosition();
         for (int i = 0; i < waysValue; i++) {
             Vector2f dir = new Vector2f((float) Math.cos(angle), (float) Math.sin(angle));
+            Vector2f offset = new Vector2f();
+            dir.mul(radius, offset);
+            thisPos.add(offset, offset);
             String variant = provider.getVariant(this);
             BulletBasicData data = provider.getBulletBasicData(this);
-            StraightBulletPath path = new StraightBulletPath(-1, speed, new ConstantVector2f(dir));
-            Long2ObjectAVLTreeMap<BulletPath> map = new Long2ObjectAVLTreeMap<>();
-            map.put(0L, path);
-            PathControllingBullet bullet = new PathControllingBullet(
-                    playground, data, variant, getHitSphere().getPosition().add(dir.mul(radius.getValue(this))), map);
+            StraightBullet bullet = new StraightBullet(playground, data, variant, offset, speed, dir);
             if (provider.hasDefinedPriority(this))
                 bullet.setPriority(provider.getPriority(this));
-            bullet.setAngle(angle);
             playground.addBullet(bullet);
             angle += wayAngle;
         }

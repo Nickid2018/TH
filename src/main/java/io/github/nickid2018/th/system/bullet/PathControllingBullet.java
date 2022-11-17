@@ -8,8 +8,6 @@ import org.joml.Vector2f;
 
 public class PathControllingBullet extends Bullet {
 
-    public static final Vector2f POSITIVE_X = new Vector2f(1, 0);
-
     @Getter
     private final Long2ObjectMap<BulletPath> paths;
     private long lastTick = 0;
@@ -31,7 +29,6 @@ public class PathControllingBullet extends Bullet {
             storedArgs = currentPath.createArguments(this);
             lastTick = lifeTime;
         }
-        Vector2f lastPos = sphere.getPosition();
         angle = currentPath.tick(lifeTime - lastTick, this);
         super.tick(tickTime);
     }

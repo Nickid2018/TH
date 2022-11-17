@@ -21,6 +21,7 @@ public interface BulletProvider {
     static Codec<? extends BulletProvider> getProvider(String s) {
         return switch (s) {
             case "path" -> PathControllingBulletProvider.CODEC;
+            case "straight" -> StraightBulletProvider.CODEC;
             case "user" -> UserDefinedBulletProvider.CODEC;
             default -> throw new IllegalArgumentException("Unknown bullet provider: " + s);
         };

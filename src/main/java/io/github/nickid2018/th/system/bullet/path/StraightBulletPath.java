@@ -2,6 +2,7 @@ package io.github.nickid2018.th.system.bullet.path;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.nickid2018.th.system.bullet.Bullet;
 import io.github.nickid2018.th.system.bullet.PathControllingBullet;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
 import io.github.nickid2018.th.system.valueprovider.vector.Vector2fProvider;
@@ -43,7 +44,7 @@ public class StraightBulletPath extends BulletPath {
     @Override
     public Object[] createArguments(PathControllingBullet bullet) {
         Vector2f dir = direction.getValue(bullet);
-        return new Object[] { dir.normalize(speed.getValue(bullet)), dir.angle(PathControllingBullet.POSITIVE_X)};
+        return new Object[] { dir.normalize(speed.getValue(bullet)), dir.angle(Bullet.POSITIVE_X)};
     }
 
     @Override

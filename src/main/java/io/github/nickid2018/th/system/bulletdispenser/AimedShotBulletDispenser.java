@@ -1,16 +1,12 @@
 package io.github.nickid2018.th.system.bulletdispenser;
 
 import io.github.nickid2018.th.system.bullet.BulletBasicData;
-import io.github.nickid2018.th.system.bullet.PathControllingBullet;
-import io.github.nickid2018.th.system.bullet.path.BulletPath;
-import io.github.nickid2018.th.system.bullet.path.StraightBulletPath;
+import io.github.nickid2018.th.system.bullet.StraightBullet;
 import io.github.nickid2018.th.system.bulletdispenser.variant.BulletVariantProvider;
 import io.github.nickid2018.th.system.compute.Playground;
 import io.github.nickid2018.th.system.enemy.Enemy;
 import io.github.nickid2018.th.system.valueprovider.floating.FloatProvider;
 import io.github.nickid2018.th.system.valueprovider.integer.IntProvider;
-import io.github.nickid2018.th.system.valueprovider.vector.ConstantVector2f;
-import it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap;
 import lombok.Getter;
 import org.joml.Vector2f;
 
@@ -45,18 +41,15 @@ public class AimedShotBulletDispenser extends BulletDispenser {
     protected void dispenseBullet(long tickTime) {
         Vector2f thisPos = getHitSphere().getPosition();
         Vector2f base = playground.getPlayer().getHitSphere().getPosition().sub(thisPos);
+        float speed = this.speed.getValue(this);
         float baseAngle = (float) Math.atan2(base.y, base.x);
         baseAngle -= maxAngleValue / 2;
         for (int i = 0; i < waysValue; i++) {
             float angle = baseAngle + this.angle * i;
             Vector2f dir = new Vector2f((float) Math.cos(angle), (float) Math.sin(angle));
-            String variant = provider.getVariant(this);
             BulletBasicData data = provider.getBulletBasicData(this);
-            StraightBulletPath path = new StraightBulletPath(-1, speed, new ConstantVector2f(dir));
-            Long2ObjectAVLTreeMap<BulletPath> map = new Long2ObjectAVLTreeMap<>();
-            map.put(0L, path);
-            PathControllingBullet bullet = new PathControllingBullet(playground, data, variant, thisPos, map);
-            bullet.setAngle(angle);
+            String variant = provider.getVariant(this);
+            StraightBullet bullet = new StraightBullet(playground, data, variant, thisPos, speed, dir);
             if (provider.hasDefinedPriority(this))
                 bullet.setPriority(provider.getPriority(this));
             playground.addBullet(bullet);

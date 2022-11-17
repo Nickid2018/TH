@@ -10,6 +10,7 @@ import org.joml.Vector3f;
 
 public abstract class Bullet implements HittableItem {
 
+    public static final Vector2f POSITIVE_X = new Vector2f(1, 0);
     private static int bulletIDCounter = 0;
 
     @Getter
